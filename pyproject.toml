@@ -1,0 +1,31 @@
+[project]
+name = "playwright-auth-poc"
+version = "0.1.0"
+description = "Simple POC demonstrating authentication with Strategy and Factory patterns"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi==0.104.1",
+    "uvicorn[standard]==0.24.0",
+    "playwright==1.40.0",
+    "pydantic==2.5.0",
+    "pydantic-settings==2.1.0",
+    "python-dotenv==1.0.0",
+    "playwright-captcha>=0.1.1",
+    "2captcha-python>=1.5.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==7.4.3",
+    "pytest-asyncio==0.21.1",
+    "httpx==0.25.2",
+    "black==23.11.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest==7.4.3",
+    "pytest-asyncio==0.21.1",
+    "httpx==0.25.2",
+    "black==23.11.0",
+]

@@ -1,0 +1,1087 @@
+{
+  "2acac303-002c-4a87-8104-6f8488e9a6a6": {
+    "session_id": "2acac303-002c-4a87-8104-6f8488e9a6a6",
+    "provider": "notion",
+    "user_email": "your-email@example.com",
+    "cookies": [
+      {
+        "name": "notion_browser_id",
+        "value": "537d5976-dfe4-4c7c-b110-e266dc8cba43",
+        "domain": ".www.notion.so"
+      },
+      {
+        "name": "device_id",
+        "value": "269d872b-594c-811f-8f56-003bb365d14b",
+        "domain": ".www.notion.so"
+      },
+      {
+        "name": "notion_check_cookie_consent",
+        "value": "false",
+        "domain": ".www.notion.so"
+      },
+      {
+        "name": "__cf_bm",
+        "value": "wO3cedFT3scV5Bc02x00vXTLzshfoBCwD5nwntlmimo-1757409044-1.0.1.1-vvrYVIgHj2coqXmONxttCJMMkgCXJg_E2nXAypR6SZ7eQHjGgRESpb_LApaFbAHFOHpjQoP6NrzrraXrNbGP_bdSfwulDyD2LXfjwg_UCYU",
+        "domain": ".notion.so"
+      },
+      {
+        "name": "_cfuvid",
+        "value": "X2f9NS0fqQx1BYNe1o9qSj_vGMmQUWrfqgfzUAKtMDA-1757409044295-0.0.1.1-604800000",
+        "domain": ".notion.so"
+      },
+      {
+        "name": "__cf_bm",
+        "value": "4cHptKIHCvYPGvAmYDoAwc_ueaAgRc0j4wPlwTrAgVI-1757409045-1.0.1.1-N.IwE.isrylzeEggaCIaP_MkXX21ZXY1sN9ltXvpAn9QAOkTZGiikb1FczJPujH_pzxkkpqh0kjJj3ET9598duWBo8c66VzexRxP6Tzt2pU",
+        "domain": ".identity.notion.so"
+      },
+      {
+        "name": "_gcl_au",
+        "value": "1.1.2010631615.1757409046",
+        "domain": ".notion.so"
+      },
+      {
+        "name": "auth_sync_message_accountSwitcher",
+        "value": "%7B%22message%22%3A%7B%22version%22%3A1%2C%22name%22%3A%22accountSwitcher%22%2C%22source%22%3A%22notion%22%2C%22accounts%22%3A%5B%5D%2C%22persistCookie%22%3Atrue%7D%2C%22origin%22%3A%22https%3A%2F%2Fwww.notion.so%22%2C%22messageID%22%3A%22a63f0c38-d5fe-4fd3-a410-9c26108c5a71%22%7D",
+        "domain": ".identity.notion.so"
+      },
+      {
+        "name": "_rdt_uuid",
+        "value": "1757409045886.2f2e71b5-9249-4c2e-9bb6-a5ed7329067d",
+        "domain": ".notion.so"
+      },
+      {
+        "name": "_hjSessionUser_3664679",
+        "value": "eyJpZCI6ImMwMDVmZGRhLTBmMDYtNWFmOC04MGQxLTUwYmRmMjUyYWEzZSIsImNyZWF0ZWQiOjE3NTc0MDkwNDU5MzksImV4aXN0aW5nIjpmYWxzZX0=",
+        "domain": ".notion.so"
+      },
+      {
+        "name": "_hjSession_3664679",
+        "value": "eyJpZCI6IjljNWI1YTU3LWM0ZTAtNDY0YS1iZDM2LTUwMDQyMTJkYWIyYSIsImMiOjE3NTc0MDkwNDU5NDEsInMiOjAsInIiOjAsInNiIjowLCJzciI6MCwic2UiOjAsImZzIjoxLCJzcCI6MX0=",
+        "domain": ".notion.so"
+      },
+      {
+        "name": "_ga_9ZJ8CB186L",
+        "value": "GS2.1.s1757409045$o1$g0$t1757409045$j60$l0$h0",
+        "domain": ".notion.so"
+      },
+      {
+        "name": "_ga",
+        "value": "GA1.1.1137500694.1757409046",
+        "domain": ".notion.so"
+      },
+      {
+        "name": "Metadata_visitor_id",
+        "value": "mfcbyymm74lnnavbife",
+        "domain": "aif.notion.so"
+      },
+      {
+        "name": "Metadata_session_id",
+        "value": "mfcbyymnbzu816qrhke",
+        "domain": "aif.notion.so"
+      },
+      {
+        "name": "_fbp",
+        "value": "fb.1.1757409047052.850463885604624855",
+        "domain": ".notion.so"
+      }
+    ],
+    "created_at": "2025-09-09 09:10:48.925667",
+    "expires_at": "2025-09-09 10:10:48.925667"
+  },
+  "2b814f4f-4ae5-42b1-a917-638a41d20776": {
+    "session_id": "2b814f4f-4ae5-42b1-a917-638a41d20776",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "fpc",
+        "value": "Ak2jqBncPcpDiPJAamepNfo",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQEr3DyLjQ4JVMMwoRq2CR2bglEd9bqY9b00Yng9n35W7i7ksyQjB6D6BWIM43aR3S2wGevwYDQfPeMfRrWPlgRGCvKXjWOcdoRvsLDD21Gg2M8-B1HcnDgd31hxbm_rF-VR5jbjQPpTJKNyfYycD6jkAT0RT3il2TJbnfqmTUYuWkgAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "71e4a097-4c2d-4894-b48c-048248f5923d",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "tYk7PyKeB+Yad68wQ+tLCG|1757409927848|1757409927848",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=083aba156ce44e4085e93527689b8152&HASH=083a&LV=202509&V=4&LU=1757409929482",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MS0",
+        "value": "1e43d2dfda454f2abdeee75899d965b3",
+        "domain": ".microsoft.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:25:46.623279",
+    "expires_at": "2025-09-09 10:25:46.623279"
+  },
+  "dd9f3514-a23c-4087-a548-78b2c3b13ee4": {
+    "session_id": "dd9f3514-a23c-4087-a548-78b2c3b13ee4",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "AMC-MS-CV",
+        "value": "Ka9ccWsll0Sj8y1z.7",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=87e206a426164e159b554afee01c783a&HASH=87e2&LV=202509&V=4&LU=1757410051019",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MSFPC",
+        "value": "GUID=87e206a426164e159b554afee01c783a&HASH=87e2&LV=202509&V=4&LU=1757410051019",
+        "domain": ".account.microsoft.com"
+      },
+      {
+        "name": "GRNID",
+        "value": "3ffc51ee-a04c-4782-8644-87f390b4ffa2",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "canary",
+        "value": "no",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ak_bmsc",
+        "value": "2BA0907D496AAC23B6E04E6303F05729~000000000000000000000000000000~YAAQqKkrF9t0nBKZAQAAXUTNLR0+RJDjuiRXKC4micMnSp9Pdtf2LD9Wt0njhA4vl7QkF1N3Ol7UwmOVyXhQuyLcmgJhONRxDoUQX8EAFh82nBw8Oif22RrxG06R6/TwTuvZDfIHyOgi/MvtJFY8XaeN0yLUcX0Zw9L/NK+YyESF6cZ0Ag+nmjsUtIn+4d1ICUz3NnnnnLoXyaBF9HsYVyLEVGTplOLuwKFqpdttwobA0pSBc5q6enncqafaTPdfz6xmU5agVmKYpGK6m9i5U8av88QR1OB7bLsd3dI0AMDV5sct63vxNQMPRwOvgG5njfSGrc5tI+3xVO3dmKpDl/ZTH+ZZeZwD0U5hYb2a+XwuleFOjfnwgtg7yy3i5nLw13SIbg==",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "78557cce-24c2-499a-8aea-8b9cca15e1a1",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "bm_sv",
+        "value": "DC8FF1EE3F908BF1812ECC586A487688~YAAQqKkrF+Z0nBKZAQAAW0nNLR0YFHMLx95VJEW+4szRuLnXqVarxzKk12WS2s5uAHvAVfwIW6TXPvj4sD6kxBJBH6w2Dbb9Hl5k9dUqEFjUOlcWBnUZ3IbDoCH2lry8WlKY9Yxi2MOcwwSLrdhcNk25za2lDaX2jZ1zp6ej2Rz75AiwNE7NlpaYMfxh1oL5u4jL+ViXhuWi3Hid8Oo/vQGdNStyziCwsUTi3ZgkfGtd0hf0JnxSaUfk7PRRzQhV66dA~1",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "E9dRB1of8EEdVyxGh/Y7bJ|1757410051834|1757410052590",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "s.SessID",
+        "value": "2adaa5f7-bbe5-4a0e-a6ed-f71eb792fdb2",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.cachemap",
+        "value": "20",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.DCLoc",
+        "value": "seaprod",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "flight-msaoauth2",
+        "value": "true",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "buid",
+        "value": "1.AXEAMe_N-B6jSkuT5F9XHpElWu2s_oHdXedBi-8-IKJom7cBAABxAA.AQABGgEAAABVrSpeuWamRam2jAF1XRQEvLZHY2hAHm1K8MvCWsQp6sMBxed7OqJBpDhNnQU2fWhWbain7iqyDhxL-wY-i1eh9PGR6ETB1HGthDLBUZewJiValoh8e0FIKIYbOHML6MAgAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQERknq-Jdrs2FbVmfG0Te8IFP8RgqOJx5_1e3L9qUrRZk8ouRt1OG3dkzaDnDcVxX7au42N8JDYykJcmEHynDhTdbWTYu8YoFw6dcLQM_5iej2m3qAzYtKyUI7KTtFLQYxKXqKgKoqojZW6MPApDeyVUqBp5dOaMwxP2g95fMzFnogAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "esctx-KeCIRjMJnxQ",
+        "value": "AQABCQEAAABVrSpeuWamRam2jAF1XRQEEhUDTUwPu64z7PHkLR13y8xJboZgTSY5GNSH3YEtilZP9xC_SbhWvAILxRoBRXRVzWzQAejXaHdZ-vz2aj-TtI4gX8eSMgmUHzPdQtWLAnt9UGrdJHrcAiBvGuhTwTsY9N7Vvpt8Fx2PHDzBIVzDFSAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "fpc",
+        "value": "AvtdHJbJ3YxJnrMDTiq_I-s9oINCAQAAAATqUeAOAAAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "3b57b8d3-2791-417e-b901-49ff12259d3c",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "brcap",
+        "value": "0",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "FyStxCR2R5oyl2nytXZN3e|1757410053692|1757410053692",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MS0",
+        "value": "2279350f21ea40c196e4c38f4191a5b0",
+        "domain": ".microsoft.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:27:36.070680",
+    "expires_at": "2025-09-09 10:27:36.070680"
+  },
+  "6b26acf3-4ecc-481e-963c-59082c2ff3ed": {
+    "session_id": "6b26acf3-4ecc-481e-963c-59082c2ff3ed",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "AMC-MS-CV",
+        "value": "vd2ES+lNykS9GwdJ.7",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=bba9aa647c344e8dae9543d1b720e11a&HASH=bba9&LV=202509&V=4&LU=1757410076406",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MSFPC",
+        "value": "GUID=bba9aa647c344e8dae9543d1b720e11a&HASH=bba9&LV=202509&V=4&LU=1757410076406",
+        "domain": ".account.microsoft.com"
+      },
+      {
+        "name": "GRNID",
+        "value": "930c32b1-cd83-40bf-95a3-b582c3e36984",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "canary",
+        "value": "no",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ak_bmsc",
+        "value": "8F7B31009EE87FD3DE486B8BAE35B696~000000000000000000000000000000~YAAQqKkrFyB2nBKZAQAAbKfNLR2aDsAh2GlHO8+cXiIedZPRrfYVwC0NH76BspxTJnXlP4Kk6WHjHRZ91UqAjHUz9s2+HTBZ4fZt+DvQONyse/DQxZsW6Wa1D2/+K9KCIBR2A49IQLpYgAlfuBPRlYA2yYiYRYh88mL28zL3BBrZ1w6fYHZXOiKCdfzQE4sMoysZp64DsKc8sVIeQjmoE642SJgeUIS4PYulTH2RN7olMBOkrdoHL9pfeJtTVL5EomudFvil756zJYOdDK5q5RUat8F7KVWvK/56u1qQp4SapEWVOihEXna6nitOCu1owIIDsqgh5hR6qK4J7OLgtZqxmIz4AtX1GR4UaF/reYsy5YMOUhuRVq/gemX1FQQJZd88AQ==",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "1b5e52c6-f093-47e9-b808-1c927aaa79dc",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "bm_sv",
+        "value": "F05DE684EBC5CC00CE43C0DA926FEA30~YAAQqKkrFyh2nBKZAQAAE6zNLR2Plf6m3ask8fB7iIFkmqvHLAX9okpf7BJG6TfHSfdOF+JR6GVU4I9ROltzyA0qFB5p3jXhI5VSum2+zuPsk4Rz5Ah+0/SZAzfTodSh1hXEXO4zywde7wX5XGLbRhtTUVBY3+gT9aXyBXzUKDhXVIEvLj7n3R/049kP0jCEHAp1VQve9IEprlAgFjO7Gr6ZinjThGO+/Sias7UwNgvHvWidA67KPMOF/xxmaA2nQpBa~1",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "P2p+fS3Gm+nYXm5GNTYIZr|1757410077137|1757410077855",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "s.SessID",
+        "value": "72f38bfc-ced8-4d38-a4bb-d5c394ba351f",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.cachemap",
+        "value": "20",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.DCLoc",
+        "value": "seaprod",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "flight-msaoauth2",
+        "value": "true",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "buid",
+        "value": "1.AUoAMe_N-B6jSkuT5F9XHpElWu2s_oHdXedBi-8-IKJom7cBAABKAA.AQABGgEAAABVrSpeuWamRam2jAF1XRQElxf3UqL4BsGjb0lvI8OS_8vwNQN9UHB-BWeaAKix3EqhekmA33hK2NoO7iMvyIwSXVsS5na0ON7k2ggp1dy2q5KQVkKUTff1NKErTM12cFYgAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQEpy4D--8G0DZ4Z04vI8wS32LuLgblNCbZfkEbX2R8JnvKI7gTzzHQHbKevICdI3HAbfjHS79JVptEkaLFcYy-i-RC7ZG29TGn9ig0YI-tN8_RsZwbZliOBTfROfzehWN_F0g9rCunO_Q6QkbMulpNhY7U5WNdY2Hz0ewvKAVsqSAgAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "esctx-SiUBFrpwBYc",
+        "value": "AQABCQEAAABVrSpeuWamRam2jAF1XRQEZlQx8Fa3ErGCcYE7zHJBpostoM4UvRCLUK-fHvS_Tl7lhPKFvvbT6YVOFnS2m91fRyRXsSxKffhC3IKMZoJCiMD4U7z08gK2lYywnBx7l1JdFSsMPMsChCeH22Ya26r4rMdY5Qm9QZGJUZeTPKAHGiAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "fpc",
+        "value": "AjMojQJYubJDrVfYzMq-S6Y9oINCAQAAAB3qUeAOAAAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "6bb0d41c-edb1-4d81-9104-6b5efe64b945",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "brcap",
+        "value": "0",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "Chz0Bk3mngAtWtstH9hoq/|1757410079023|1757410079023",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MS0",
+        "value": "ab8e1990492a484db60b555a5f51cb7f",
+        "domain": ".microsoft.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:28:01.545437",
+    "expires_at": "2025-09-09 10:28:01.545438"
+  },
+  "60b46ad1-b617-4367-8c3f-8056b450cc2c": {
+    "session_id": "60b46ad1-b617-4367-8c3f-8056b450cc2c",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "AMC-MS-CV",
+        "value": "NyVKOKoMvkiLsFHg.7",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=d4263f94739b43f3b70a0d94845e569d&HASH=d426&LV=202509&V=4&LU=1757410700790",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MSFPC",
+        "value": "GUID=d4263f94739b43f3b70a0d94845e569d&HASH=d426&LV=202509&V=4&LU=1757410700790",
+        "domain": ".account.microsoft.com"
+      },
+      {
+        "name": "GRNID",
+        "value": "dedd0eee-6cf7-4dfb-a199-c1d074010bb8",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "canary",
+        "value": "no",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ak_bmsc",
+        "value": "64F3ACEB8458226282D65CFF8FE13128~000000000000000000000000000000~YAAQNTNDG4+jwB6ZAQAApS7XLR3fWe3td4PKC2ppgr4XMX4QEE222L+L3O5ibsxeflrgHXCQjU8COhS7XW/ICjphEvFVIACCQiUSEW65keAoHLiOmu2VekxIGpEevRegzgc7kGKVfF4efQXfYX+1M/QCWaNkBkOhd1C5+AbLrYEXuemGDp9HxMo+EutGtbsc079wDsKq+0QUgApVw3s6wiW2+jE5rZZck3oMG29mT3qwuUCGidFCoh+4PoioAjIODGJwPQ1//AVb9ircXdgnc9EnqzT9hDFSwKUxXu16ABxTWYJOh8sov8OCtPFoNqVHq4SwRwB2YbBW6JPe45lcmKbeAYCwhfq+XjmtOwogLx5UOODflNxxTDhOKhfE+tFDMypusQ==",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "a192addc-fee7-4347-87d6-5be34f0db00c",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "bm_sv",
+        "value": "ED34998B04B9A3E2A263E47540F120B3~YAAQNTNDG7mjwB6ZAQAA0DLXLR0rGCPjcIayTpw/YBNepgywhObKFAkUkSuLVNdVLysrJ7/3XQolt3wi2u+d2R5bV9pf0UF4kK+YidwJ3Cj/YVdDARkbWn5dBtDV3Q11b684PrIArgdoRUmxcTFdzzEK2lOy9SJWSDT2yDS9LMX9wF1HEMp5KgYdcgA6i3OU+1riODeQ/id6MGJ8nB7t6RnHt23fmSvnK0azBBZf1w/jLeL3jrLL5ZOl51XGnQpn2iTV~1",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "kvmzjjU6cLK52/BpU5b+LU|1757410701447|1757410702279",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "flight-msaoauth2",
+        "value": "true",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "buid",
+        "value": "1.AQ8AMe_N-B6jSkuT5F9XHpElWu2s_oHdXedBi-8-IKJom7cBAAAPAA.AQABGgEAAABVrSpeuWamRam2jAF1XRQEzXTW9_2M1kRKa62ejmqf7UpcbxHCFkFCDaTokvxdPLXOb-qNHXwLF6YqZRPFEkJMtMHHNNWQ1W8ZKawreLL2ih7WxDgVlYDRaD1W696xJdsgAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQEC3BWh_lVf1r5cqUW7998pCVIZSS_DPfNWw0qPU_PRhTlIg5m6XAZm_k2E5vrghBmH2gu51KIwA0BJzpvFLVxzlqnm0Fb3Z8LEas74BOLjctPr7BvOMqSbwxF09n4ebx9qHhQSe4rZ5eLjxXGMuuDMkaYT9VLT62rQWWpcEHUhcMgAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "esctx-CZORYGemwY",
+        "value": "AQABCQEAAABVrSpeuWamRam2jAF1XRQEiR4YS-it3xjYzxwU8k7vkGr-_UVXy6Pd_2QzxzkIZJ6yEDkpVk-sVm1mCeJMFsYQ_-J1Yf4JhPDZVWTA3utOuUJNWWSLS-wRDIAk2xPdJcWWm9tVt4ugJIr1dUOm2V3ffmHVqzjutK_jJZezSqQu4CAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "fpc",
+        "value": "AsKVwGxfQ3tHiSonwtetjXs9oINCAQAAAI3sUeAOAAAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "539286aa-034e-402b-ac7c-68a6e5bc8f77",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "brcap",
+        "value": "0",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "MQrsOysA+S82+A4xC0BaGL|1757410703292|1757410703292",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MS0",
+        "value": "f4c4ac23a5e049bcb5560e7a0fe9d2d4",
+        "domain": ".microsoft.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:38:25.624076",
+    "expires_at": "2025-09-09 10:38:25.624077"
+  },
+  "8b44a3fe-cbb8-4306-a801-f39b272f1c54": {
+    "session_id": "8b44a3fe-cbb8-4306-a801-f39b272f1c54",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "AMC-MS-CV",
+        "value": "a8+kutuzPEO+bRYH.7",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=0efb8e6486f24f4c8b8c54913bf68759&HASH=0efb&LV=202509&V=4&LU=1757410799630",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MSFPC",
+        "value": "GUID=0efb8e6486f24f4c8b8c54913bf68759&HASH=0efb&LV=202509&V=4&LU=1757410799630",
+        "domain": ".account.microsoft.com"
+      },
+      {
+        "name": "GRNID",
+        "value": "1c1799c7-9dac-452a-bafb-bcddaf3c26d1",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "canary",
+        "value": "no",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ak_bmsc",
+        "value": "958C2E8A1EE2EE890063A4E2C9B09AE1~000000000000000000000000000000~YAAQTjNDG9MFVuOYAQAASrHYLR3T1SuddPHrsAYvGJh5te0Q1oMJmXLdkM/KPsKzqDkRg4WsjLD4Ns39CA2BhxNDQRsjwDmuTWSQ2HxjYQgR1VpSBjr/MW0YCwqOx23ar+sCVrM5y6AtHk0UpHHPVnzepgqSstub0iNqbfvA7FcQiAfBa9JZhBAcftCjGbzmhMs4EpdOsaUsaoSlDfFOTW4k47mS4aRC338jXVaMdeAGYqJkSeJDDTDQAyOgB9NtU2e3Vf/Azx2+bmphQcoVAwtJ/ugZvVCKyxeCkeSkKXe5CVBPeslIBov+Vf3FzWcCpQ1Wem+Z5L4G3uxxOKFpa2Kr6MqtsH3tAYR79ztVZybQ6bx96OHTgQnbQF3AF1wb2o56Cg==",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "6b3d1f1b-a542-47b0-b6e1-d3f2758f57ba",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "FPlFeYDoKYTu1QZLo1haMD|1757410800472|1757410800472",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "bm_sv",
+        "value": "A6AF7297B439092DA28F78D61685C8F7~YAAQTjNDG+YFVuOYAQAAoLbYLR1Qy8l/JzsoWCtFx+iINV3KzFLFI52mHXia9JjCfDExMRBHQx+el6tAJf9tI+ugl5cXeI2L1gnBi+qhyoBm9UhG6zoDljuwENDzA2vv112cH+FhXVJpGfKEOkzae/0pObteJzoYufgXnkHlfRLQN1rJozIMPmubeREmALva6yVaQ+rBOXBZnLhDIPZDdXypj/N1rblPwJw0Y5PTCIRWXKyD+8Bd9weCnvzQk/0Yrzp/~1",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "flight-msaoauth2",
+        "value": "true",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "buid",
+        "value": "1.AT0AMe_N-B6jSkuT5F9XHpElWu2s_oHdXedBi-8-IKJom7cBAAA9AA.AQABGgEAAABVrSpeuWamRam2jAF1XRQE9gnvNb7tjlyrFz0EDC-aKK1nB1rC4wmEmYZBsHnzSdg38DZIMBEEDjA6K0WeSFzbTqqrSL_R2i3OtVEyjPdjilTj-MCWrVMglUL34psthrUgAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQEE-s1x8IxdW0ax6V4iwDE9zpSb8L7AolvLB-foIvk0_5gb9khQKi7nYMlW4LU4LK5SPNB8PkS8ng4Ymj6cLGX10qTerlNcm1if4eN_krfT2RtLtn_K7hv8Y0P_Gl-X-HBXPENO3_mwmFrHm0ACoxTqZafut_Uj1a1JBjWl9bfVl8gAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "esctx-ISCCvda5sFs",
+        "value": "AQABCQEAAABVrSpeuWamRam2jAF1XRQE9jIjE4-sZw-ia-G7q6847yc_Z_OMz63GKkhCH0VjdmH2IJEIXup3A8sXRQyMo0Navt-DA5v5ZWfx7jcA6ig2rXSerZPu_QW5xUR5nVAhRGm4BYXj3Pr4XHuMhOidNvlPB3R3RXYyo8jEohuWVyZsZyAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "fpc",
+        "value": "AjY61ZULa3NDmzo8CiQFMDA9oINCAQAAAPDsUeAOAAAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "274204e2-399e-4239-ad5e-d531840e8db1",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "brcap",
+        "value": "0",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "MS0",
+        "value": "e73c28c598fc46959a89b4410049bf29",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "VFXtu2kyH08hy1kzB524Yp|1757410802585|1757410802585",
+        "domain": "login.microsoftonline.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:40:04.768658",
+    "expires_at": "2025-09-09 10:40:04.768658"
+  },
+  "bd42f17f-f758-497d-9585-de3d1732c64e": {
+    "session_id": "bd42f17f-f758-497d-9585-de3d1732c64e",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "AMC-MS-CV",
+        "value": "CpMCIcNTDk6qgmB9.7",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=9c9eb9c238bd43719af2d2c46b8cb367&HASH=9c9e&LV=202509&V=4&LU=1757411241992",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MSFPC",
+        "value": "GUID=9c9eb9c238bd43719af2d2c46b8cb367&HASH=9c9e&LV=202509&V=4&LU=1757411241992",
+        "domain": ".account.microsoft.com"
+      },
+      {
+        "name": "GRNID",
+        "value": "d01c223c-5248-4387-ab01-13ca18f05acc",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "canary",
+        "value": "no",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ak_bmsc",
+        "value": "80E02A0799A1220DD16117ED3F531BD8~000000000000000000000000000000~YAAQqKkrFze4nBKZAQAANXLfLR3vyph1HBnA5j2s8DAhKacQDWG3JPEB8ophMzFau0ln8wTdAnehMH3YU6n4LW+NPFYqhtXEC2S5EjNf+PJGVOZ70AM0gPctRmqxUKgbFJzZ56lFZ7wyRCWPu8hhzbVdfW7/tvXZG6Q375UiEo6PH7/Yvsmz7+Zy9z15gJa2KrbC0XjL4e70aN1zMJITWVVuw9oqoE0mJHFsIXMd5FjBZjy5mQnLkfsNcoPufsTdqNf3kp1+I9QKScYODCCABFU8gVvGsic1m98ldSWNhteuqrKbUfxyfPYfTpCjm5GjkyrqqQ2ANQf1jEULAF88Zu97aAyxDbKpoXEpmprr3vvp1s3qQVsTv61ZPs7xRkLiYQtWgg==",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "6bafa395-8064-497e-bc0e-86ca48de0d0e",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "rL2zDf8E9HIAPlBkhKx+kt|1757411243093|1757411243093",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "bm_sv",
+        "value": "7B1CAE37681123DDA15647D160FED466~YAAQqKkrFz+4nBKZAQAAeHbfLR1vGr1x5ez1mtcuNVXhCmDevVdW/QWiOU+w9QVpTbniUfmjOP/NlopWEXFynE4P4YWJEIbEvyMOk8jQdJiE16+o5gec4CJOKikWVkhxfd+9tBAj+0NRKfA3eDIzQNeqwfjTr23x2S/bTBqjXRvNdFL4mMs1v/xg43COARRp9WVP1J92Sm+edNKpua3OKAQ4+Hqx0pQP527DROZgR3cTBuk0iFVs2Fv7SdwHjL46Lian~1",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "s.SessID",
+        "value": "0e32108f-6665-42f7-92e8-033a9ddad5a2",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.cachemap",
+        "value": "20",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.DCLoc",
+        "value": "seaprod",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "flight-msaoauth2",
+        "value": "true",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "buid",
+        "value": "1.ARoAMe_N-B6jSkuT5F9XHpElWu2s_oHdXedBi-8-IKJom7cBAAAaAA.AQABGgEAAABVrSpeuWamRam2jAF1XRQEfpIbq9GuUVy66PHx19kmmYW28_06IaShCMm7Dox4ATXLr6RSdDK89R6egRK-0dqAEfFBXoilg84yC2zEIUDjaynVPBjFfnLJOO9JHmZw0c8gAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQEHnfM713WTAacgGhldh5HDrkzuZuSQZ3Jdn-gFcKorcC8fZxXRd8aP44nVMxR7wC-uCPgASbIQYtIfLSZcwmnz6sS5_aFMXej1QvV1Y1k2foM3l8SC2bPbqWUdycQw09BzsjXnsaJvAMLf7u1sRqoL7OLDLw2J0U1AnT0CKZ7Zj4gAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "esctx-Nyym27Hop2Y",
+        "value": "AQABCQEAAABVrSpeuWamRam2jAF1XRQEJrovIpPb1uNEUI3FqZRSll9p8UmhrhR7x-DBYb5J9Cr2QwUtnHX0y9PFXJfjLfkpK4eaUSPHpDskQu3iI35WiuLH9JTkMOCMXhvf-NLb-PcPMhDH2Olmn81xGi7-EWzaKKKwM9VPAxAXQyvu-adpfCAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "fpc",
+        "value": "AvysUEb9u7xKp1906Z6kFMs9oINCAQAAAKvuUeAOAAAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "ec3b49bc-831a-4ab2-bff4-99265b0653a8",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "brcap",
+        "value": "0",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "MS0",
+        "value": "dd1d1abd8c14416c9af7fc5c15872842",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "Hx+dmawfqZrox6dekn9v89|1757411245383|1757411245383",
+        "domain": "login.microsoftonline.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:47:27.291628",
+    "expires_at": "2025-09-09 10:47:27.291628"
+  },
+  "0227c502-8abf-415a-8c66-0c4b733d62c2": {
+    "session_id": "0227c502-8abf-415a-8c66-0c4b733d62c2",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "AMC-MS-CV",
+        "value": "WNSGDigwZkW0HIzg.7",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=8bb3eec566a1472db8c1745c3954534f&HASH=8bb3&LV=202509&V=4&LU=1757411269525",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MSFPC",
+        "value": "GUID=8bb3eec566a1472db8c1745c3954534f&HASH=8bb3&LV=202509&V=4&LU=1757411269525",
+        "domain": ".account.microsoft.com"
+      },
+      {
+        "name": "GRNID",
+        "value": "1efa43d4-2594-4306-ade6-e7aeb45d27ce",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "canary",
+        "value": "no",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ak_bmsc",
+        "value": "3236E63D0ED6AEBD29A8DDFED9F3C190~000000000000000000000000000000~YAAQNTNDGyjlwB6ZAQAAWtzfLR132uZThbRoKeRTn3KDt8GXlzb4oCtDzo8+iNbPZ5pr07wnJNirK9D7zBjbcGV+cZmO+oVcpnz+GBMiljz87l6ta7ku4qOd7cEQCmem5oX7nHc5owDJM1kBnkNUvXyuwkbsEqDmKF3matn8SUQu2wYOPA/xWkELc0tsj0asEnuF7pJTzTUM0u4Pux7Xa80vAlZFBMV98iSzRVbV4+AUrbo6MJpgY20q0jdzYr4VnKEJJ3Afe96U+mqtRjrUg6PnNSG3vbEzG6Trlw+z3S2oayZh6GC0KX6eM5tHWqb0MKocXUFH9FCPF83ts06zw7u8WTkwFeqjkPsvm3jJtAsTVJPTPKEfWVmKRT3oUJ6xJ/1i/g==",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "8056ae34-f2a8-4257-8d40-34158c429e83",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "bm_sv",
+        "value": "C4FDF2CC309350D78A47B6EB433CECB3~YAAQNTNDG0zlwB6ZAQAA8uDfLR3YdoOM7XyBvjiVQi1e0on3xNjt0eUWGf9RduufmpVWNjEzkVMvEZlS3nmCUVs/aNwoMjPAM22hrZ5guakp6HwDmELOczUTls/25XhhTZ2bi5GAO9VARaxiFnH+vzK8Ors7CPa1f95emF5xcxb4Hqc7yUr0okogkns9YIm3vLtAnsNDMrRGPD76odwg6zRBUzEs1Ns6nKHBt2usb8tqHYjCsLdhFDtOm9Iy2icS53jk~1",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "VNSF4z+T/IA8yoZmhWNhQW|1757411270176|1757411270958",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "s.SessID",
+        "value": "d13e65af-a101-4831-91d1-bebaef7d98a3",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.cachemap",
+        "value": "20",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.DCLoc",
+        "value": "seaprod",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "flight-msaoauth2",
+        "value": "true",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "buid",
+        "value": "1.AXAAMe_N-B6jSkuT5F9XHpElWu2s_oHdXedBi-8-IKJom7cBAABwAA.AQABGgEAAABVrSpeuWamRam2jAF1XRQEpTIwTncZm4KDYLWHVqbuMdJXslhD8bXiL-4u5lsJruUfpAU_TN54HIaqHSvLLZPJckkFHFf04PHy9C-1k-PrnqQnHeUbMFO8xQUkaEApg3wgAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQEfG13E6f1ft5jhRSqsYu8XoJAUhfN8CZpq5el9hX4JcECExTNchjy_IdBgZwIJlgPbuZwuSlyMKObe1G_wJoh4NmzTDt64ICiYAXqWfR0A1dFOzJZmd2KiWaFI5sfMfTWK16S5PYF879Ej2MCtIFQrhWeXOdndFPMQCcRNVy-Tk8gAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "esctx-LlQ8h3pRk",
+        "value": "AQABCQEAAABVrSpeuWamRam2jAF1XRQE-_G_BBqPYWkDk3myqua_fknVx_gzNE-Y2f0M1nvjOlx1AV_GbVSrzbM3TF7btT3byc9RRrCrWCDbFNAdIFrtdsEIkD__08qtZkpoB-llFhBU4RL1KvlPHI0eB7NW17xd9PkT-ScNTlWaYdQxWC7C1yAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "fpc",
+        "value": "Api5jIUtwO5Ds-T1RSQPHfY9oINCAQAAAMbuUeAOAAAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "21a0553f-1d98-4150-bec4-46fdb5c22b2a",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "brcap",
+        "value": "0",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "Ub8dwg9gcRqJJ7nmxoiNOc|1757411272478|1757411272478",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MS0",
+        "value": "e3f6656b28fe4acfb1b31ab9d733085d",
+        "domain": ".microsoft.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:47:54.755580",
+    "expires_at": "2025-09-09 10:47:54.755580"
+  },
+  "897ec009-d21b-4343-a64a-b34747e5abb6": {
+    "session_id": "897ec009-d21b-4343-a64a-b34747e5abb6",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "AMC-MS-CV",
+        "value": "lRJMQAC++US+g71N.7",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=bb5090628fe2407194f5e10654a390ca&HASH=bb50&LV=202509&V=4&LU=1757411369283",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MSFPC",
+        "value": "GUID=bb5090628fe2407194f5e10654a390ca&HASH=bb50&LV=202509&V=4&LU=1757411369283",
+        "domain": ".account.microsoft.com"
+      },
+      {
+        "name": "GRNID",
+        "value": "dbbd1d8f-475d-4c9f-aca0-b6d3b2668e47",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "canary",
+        "value": "no",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ak_bmsc",
+        "value": "2530C56AAF18B7D62A96932AD18185F2~000000000000000000000000000000~YAAQNTNDG0vywB6ZAQAA5mHhLR2HPKh986pO1ftLZ6vqC/nj4DxC9AxgyIEyf3IITZpiG72s4N9X4CK6rBK0eIhOpZ+Bb28BjuC+VED4zO+KbGoF+8RKlKIFFEGS4UozXAl+ttk/VRESkh61e0qOVPEXUuSjo2pwHGGfKR1XZF20XaarfYg4+igafsxQSZAEZPzxpdhCz9O61KLZ74Ncp7yUnOWRnq6c42pUrR6FPoViuRgoCVF/WPjgKBXpx9a2IGX2FBrJMGgdlY74C56GFb4YPcrUwMtCniGNGAvFx0YArXkuqw/AAA5ckdAdP7Rh8wmcAnJOJBs166efCjy3KxZoeJM3+h0jBVJe9GsPHmfD8IeXTY8rDd0Fp/tDwHg8bym+RQ==",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "b7a42053-12f0-45dc-a2d8-5afd624a85dd",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "bm_sv",
+        "value": "E9F602D5280ECEFAACA025BE77D43CB6~YAAQNTNDG6zywB6ZAQAAO2fhLR1NEcS4+Rw48H66Eluxr9BDr7XidCeixa43KgyhEn8u9uXZnD9+A8Vwom2/sATHp40UTDG+QgILmsMBpeWpjl6JT753JLRF8XDT4gAjlUYtxyibHNBFhfg0oTo7Cm1XvM/jaRNBIou5Fcx10rdYpxbLlavbWv8RGgEOM1r3SannH0ifw1+9OOLc/sGwjZfdY+nRb6a8qt34tp7UHo+cp5YPxMelbT+qFTGcF4kxCfg1~1",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "/bVEUF3pK+HeVTXvkxbaEv|1757411370191|1757411370950",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "s.SessID",
+        "value": "2120c282-3c27-4671-a89e-0f66df2f45b8",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.cachemap",
+        "value": "20",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "s.DCLoc",
+        "value": "seaprod",
+        "domain": "admin.microsoft.com"
+      },
+      {
+        "name": "flight-msaoauth2",
+        "value": "true",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "buid",
+        "value": "1.AVQAMe_N-B6jSkuT5F9XHpElWu2s_oHdXedBi-8-IKJom7cBAABUAA.AQABGgEAAABVrSpeuWamRam2jAF1XRQEt6PAkVmvizhvYrMvZZwFORWCGexnX21I-Le8oxqLfnMkB65P7ojCFSdl5sgmejnX-kFMqdnyotxeV0-q2GkEdR4Zu_xgLHzh4vyMv2hRvtwgAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQEN41Qdo8YPQAm11P0YI1XkNxeDOEgF-ubw4OlFiVnVvnMaIZObJV1iIGXJYu_WC9S_eyZuiOH4gOl_ihJkyZDOJCheTa6LqhnqOhPrQpXRQZFUE54--alb-CKWEYqevlufVpDVvUcjLMVKSbMb8M277nAO6oihGNJ9WZkTiL78ZMgAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "esctx-4f2G2OhUCqs",
+        "value": "AQABCQEAAABVrSpeuWamRam2jAF1XRQEs0HEDR972V3-fODwbmqPRc0QYUv2yPFDcuyp32YCoeNI2MQiA6JOUpL0QxNwXtd2H3E7eyXzuFyhHPwqbYOOoiR8jaHkwUzIDok4rzscLOpJDsaH3dpq10HzwpzQ-fZLTPXG3A8BIl85Le2QUEcsBSAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "fpc",
+        "value": "Ame8WHeHiHNFtAvR4pHRp749oINCAQAAACrvUeAOAAAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "0a8a0104-9182-4e56-b50a-4f07d48c174d",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "brcap",
+        "value": "0",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "IYf00X4WDizKaAHH+40ItF|1757411372030|1757411372030",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MS0",
+        "value": "b5977353c8c24e309e89cf87fdb6f3f8",
+        "domain": ".microsoft.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:49:34.481813",
+    "expires_at": "2025-09-09 10:49:34.481813"
+  },
+  "10fa8a59-2bd5-499b-8d5d-143133410920": {
+    "session_id": "10fa8a59-2bd5-499b-8d5d-143133410920",
+    "provider": "microsoft_365",
+    "user_email": "ne01.testing@gmail.com",
+    "cookies": [
+      {
+        "name": "AMC-MS-CV",
+        "value": "LQc1BzprCEeq45YO.7",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "MC1",
+        "value": "GUID=1afe62ce12b44e939857b04dba4660c2&HASH=1afe&LV=202509&V=4&LU=1757411434614",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MSFPC",
+        "value": "GUID=1afe62ce12b44e939857b04dba4660c2&HASH=1afe&LV=202509&V=4&LU=1757411434614",
+        "domain": ".account.microsoft.com"
+      },
+      {
+        "name": "GRNID",
+        "value": "322700e3-0eb5-454d-af37-a3b821d5d083",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "canary",
+        "value": "no",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "ak_bmsc",
+        "value": "6F2116BCC54392430307C047952FF7C7~000000000000000000000000000000~YAAQNTNDGyz5wB6ZAQAAamLiLR3aE116HBwUn2a4YqF1Jo6cZmYHYmj2/Oee4fSWEu9HkMHLhfVfGJLjV0CS91eACt0QtsANPn9j/bmSkM+MoyRobEm/P8iJZHkDAGs4CBVOrAjcueV5Z1bCdmBbtUgzPQSCH8o+kig7741xWObkpIFglMie2/tudXRs0bZAV6s9EdhghgvH1HEBNLLgeGrmJiUtSKCXTuDTwGNSHjJ9XLtpugaHugq4oZg8Xsx1HPggfiRwrbuozULsMM3H7GeXVGZzUmgKTx8DuusPJ0OgcbWq+HMt9j48iCH+653e0mQI1pFXLyqv8OIn2NDL5UBpmQwxilH1g233ETWX7tn0HWACF9I9nKgc45lIH5xQ3MvhgQ==",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "ca5b7a3b-ada7-4b33-b233-237298338fdb",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "bm_sv",
+        "value": "FE58A7EF67401292AE75A8958725986E~YAAQNTNDG075wB6ZAQAAg2biLR3l4DGdm4iAUEtngA6t95ogDOi0GXdp4qa2rek1RQOF2PGEp1IoR9729aeoc2U6vMnIBvgaDqPZpCR2dGNsFQxJl6hMKDTtv0ynF1hvQzg4ibMGoiPGXDq+eibrV5dUQTCoKWpup1UwPLXh9SEq+VjEwcpw8HL6n33lhD0H8Ro/Cs1xaH5Tj01qxUGag137UAI8aW3p5HvIy5QNbiBnKHMYQq3EdRfsFRXfRRdI1Bv0~1",
+        "domain": ".microsoft.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "SeaexEYSiYtJn1Az9vqb+v|1757411435556|1757411436258",
+        "domain": "account.microsoft.com"
+      },
+      {
+        "name": "flight-msaoauth2",
+        "value": "true",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "buid",
+        "value": "1.ASsAMe_N-B6jSkuT5F9XHpElWu2s_oHdXedBi-8-IKJom7cBAAArAA.AQABGgEAAABVrSpeuWamRam2jAF1XRQE1WfBwyaUnKYG9LRua6ku_3WFh45gKe2MUz6mnHVCDcotM24aZ7_uHlJXISwMvvAB2wYzw5KdWxDuSXt_A6mAkv_mIe__gIseGHwfpfoB9vggAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "esctx",
+        "value": "PAQABBwEAAABVrSpeuWamRam2jAF1XRQEIwWK5ruw8E_CswgcrcG1e3OBrIDyp8C0G9oSLvXUMSmDiF0P8Lv1soTseyn8aHfJt0haaxJYpOO6Cz-yUZTZpDjOiVP1zKt6oQxavY2a1PcTdeI4G19MOcHYY2IwbY_mMq90m8XPL0g2tmLiWPwdKLgagL85S-ZXZ8nTS1I-a2wgAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "esctx-H8D88aHM0Q",
+        "value": "AQABCQEAAABVrSpeuWamRam2jAF1XRQEOjc2XdK8ZV_qpQOpE_DpoEwgqaYgXziWV5RUmcUHnw7LwqoZAtAZla5aeQgy_k9jgOLYfx2yw0HEOEluljd_WuPbZhuoOXbTC51DiDyoSZ82vZ_hahq4R0bBUlwSwaZZwjxMAIYISmi56OmboltmzSAA",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "fpc",
+        "value": "AvXPqtmRg9NEpz27KS_vlpo9oINCAQAAAGvvUeAOAAAA",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "x-ms-gateway-slice",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "stsservicecookie",
+        "value": "estsfd",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MicrosoftApplicationsTelemetryDeviceId",
+        "value": "48d98b68-ebe1-459d-b903-f4713173700a",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "brcap",
+        "value": "0",
+        "domain": ".login.microsoftonline.com"
+      },
+      {
+        "name": "ai_session",
+        "value": "hjwfhT8cA9N1VKhWR2KKG8|1757411437081|1757411437081",
+        "domain": "login.microsoftonline.com"
+      },
+      {
+        "name": "MS0",
+        "value": "b13b15bc389940d295b1b207c885881c",
+        "domain": ".microsoft.com"
+      }
+    ],
+    "created_at": "2025-09-09 09:50:39.635851",
+    "expires_at": "2025-09-09 10:50:39.635851"
+  }
+}
