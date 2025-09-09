@@ -19,7 +19,7 @@ uv pip install -r requirements.txt
 
 # Install Playwright browsers
 echo "🌐 Installing Playwright browsers..."
-playwright install chromium
+uv run playwright install chromium
 
 # Create .env file if it doesn't exist
 if [ ! -f ".env" ]; then
@@ -30,7 +30,7 @@ fi
 
 echo "✅ Setup complete!"
 echo "🎯 To run the application:"
-echo "   uv run python main.py"
+echo "   uv run python -m src.main"
 echo ""
 echo "🧪 To run tests:"
 echo "   uv run pytest tests/ -v"
