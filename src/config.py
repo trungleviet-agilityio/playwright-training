@@ -22,10 +22,28 @@ class Settings(BaseSettings):
     slack_test_email: str = ""
     slack_test_password: str = ""
 
+    # Browser configuration
     browser_ws_endpoint: str = "" # If provided, use this endpoint to connect to the browser
-
-    class Config:
-        env_file = ".env"
+    
+    # Provider-specific configurations
+    slack_workspace_url: str = ""
+    google_api_key: str = ""
+    browserbase_api_key: str = ""
+    captcha_2captcha: str = ""
+    
+    # Storage configuration
+    storage_type: str = "mock"  # "mock" or "dynamodb"
+    dynamodb_table_name: str = "auth-sessions"
+    dynamodb_region: str = "us-east-1"
+    aws_access_key_id: str = ""
+    aws_secret_access_key: str = ""
+    
+    model_config = {
+        "env_file": ".env",
+        "extra": "ignore",  # Ignore extra fields from .env file
+        "env_prefix": "",
+        "case_sensitive": False
+    }
 
 
 # Global settings instance

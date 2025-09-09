@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 
 from .auth import AuthStrategyFactory, BrowserManager
 from .config import settings
-from .models import AuthProvider, LoginRequest, LoginResponse, AuthSession  # noqa: F401
+from .models import AuthProvider, LoginRequest, LoginResponse, AuthSession, OAuthTokens  # noqa: F401
 from .storage import MockStorage
 
 # Configure logging
@@ -67,10 +67,43 @@ async def login(request: LoginRequest):
         execution_time = (end_time - start_time).total_seconds() * 1000
 
         if success:
+            # Parse OAuth tokens from message if present
+            oauth_tokens = None
             access_token = None
             refresh_token = None
             token_type = None
             expires_in = None
+
+            if message.startswith("oauth_token:"):
+                # Extract OAuth token from message
+                token_data = message.split("oauth_token:", 1)[1]
+                try:
+                    # Try to parse as JSON if it contains multiple tokens
+                    import json
+                    token_info = json.loads(token_data)
+                    oauth_tokens = OAuthTokens(
+                        access_token=token_info.get("access_token"),
+                        refresh_token=token_info.get("refresh_token"),
+                        token_type=token_info.get("token_type", "Bearer"),
+                        expires_in=token_info.get("expires_in"),
+                        expires_at=datetime.utcnow() + timedelta(seconds=token_info.get("expires_in", 3600)) if token_info.get("expires_in") else None,
+                        scope=token_info.get("scope")
+                    )
+                except (json.JSONDecodeError, ValueError):
+                    # Fallback: treat as simple access token
+                    oauth_tokens = OAuthTokens(
+                        access_token=token_data,
+                        token_type="Bearer",
+                        expires_in=3600,
+                        expires_at=datetime.utcnow() + timedelta(hours=1)
+                    )
+                
+                # Set response values
+                access_token = oauth_tokens.access_token
+                refresh_token = oauth_tokens.refresh_token
+                token_type = oauth_tokens.token_type
+                expires_in = oauth_tokens.expires_in
+                message = "Login successful (OAuth token acquired)"
 
             # Create and save session
             session_id = str(uuid.uuid4())
@@ -79,15 +112,14 @@ async def login(request: LoginRequest):
                 provider=request.provider,
                 user_email=request.email,
                 cookies=cookies,
+                oauth_tokens=oauth_tokens,
                 created_at=datetime.utcnow(),
                 expires_at=datetime.utcnow() + timedelta(hours=1),
+                last_used=datetime.utcnow(),
+                is_active=True,
             )
 
             await storage.save_session(session)
-
-            if message.startswith("oauth_token:"):
-                access_token = message.split("oauth_token:", 1)[1]
-                message = "Login successful (OAuth token acquired)"
 
             return LoginResponse(
                 success=True,
@@ -125,6 +157,44 @@ async def get_session(session_id: str):
         return session.dict()
     else:
         raise HTTPException(status_code=404, detail="Session not found")
+
+
+@app.get("/sessions/provider/{provider}")
+async def get_sessions_by_provider(provider: str):
+    """Get all sessions for a specific provider."""
+    try:
+        provider_enum = AuthProvider(provider)
+        sessions = await storage.get_sessions_by_provider(provider_enum.value)
+        return {"sessions": [session.dict() for session in sessions]}
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid provider: {provider}")
+
+
+@app.get("/sessions/email/{email}")
+async def get_sessions_by_email(email: str):
+    """Get all sessions for a specific email."""
+    sessions = await storage.get_sessions_by_email(email)
+    return {"sessions": [session.dict() for session in sessions]}
+
+
+@app.put("/session/{session_id}/refresh")
+async def refresh_session(session_id: str):
+    """Update session last_used timestamp."""
+    success = await storage.update_session(session_id, {"last_used": datetime.utcnow()})
+    if success:
+        return {"message": "Session refreshed successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Session not found or update failed")
+
+
+@app.delete("/session/{session_id}")
+async def delete_session(session_id: str):
+    """Delete a session."""
+    success = await storage.delete_session(session_id)
+    if success:
+        return {"message": "Session deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Session not found or deletion failed")
 
 
 if __name__ == "__main__":

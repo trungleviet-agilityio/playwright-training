@@ -13,6 +13,7 @@ dependencies = [
     "playwright-captcha>=0.1.1",
     "2captcha-python>=1.5.1",
     "browserbase==1.4.0",
+    "boto3>=1.34.0",
 ]
 
 [project.optional-dependencies]

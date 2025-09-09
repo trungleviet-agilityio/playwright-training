@@ -57,6 +57,17 @@ class SessionCookie(BaseModel):
     domain: str
 
 
+class OAuthTokens(BaseModel):
+    """OAuth tokens for API access."""
+    
+    access_token: Optional[str] = None
+    refresh_token: Optional[str] = None
+    token_type: Optional[str] = None
+    expires_in: Optional[int] = None
+    expires_at: Optional[datetime] = None
+    scope: Optional[str] = None
+
+
 class AuthSession(BaseModel):
     """Authentication session."""
 
@@ -64,5 +75,8 @@ class AuthSession(BaseModel):
     provider: AuthProvider
     user_email: str
     cookies: List[SessionCookie]
+    oauth_tokens: Optional[OAuthTokens] = None
     created_at: datetime
     expires_at: datetime
+    last_used: Optional[datetime] = None
+    is_active: bool = True
