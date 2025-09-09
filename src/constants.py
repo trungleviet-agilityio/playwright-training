@@ -1,7 +1,12 @@
 """Constants for the Playwright Auth POC."""
 
 # URLs
-SLACK_URL = "https://slack.com/get-started#/createnew"
+SLACK_URL = "https://slack.com/signin"
+SLACK_ALT_URLS = [
+    "https://app.slack.com/client",
+    "https://slack.com/signin",
+    "https://slack.com/get-started#/createnew"
+]
 GOOGLE_URL = "https://accounts.google.com/signin"
 MICROSOFT_365_URL = "https://account.microsoft.com/account"
 SALESFORCE_URL = "https://login.salesforce.com/services/oauth2/authorize"

@@ -12,7 +12,7 @@ class BrowserManager:
     """Manages browser instances."""
 
     @asynccontextmanager
-    async def get_page(self, headless: bool = None) -> AsyncGenerator[Page, None]:
+    async def get_page(self, headless: bool = None, browser_type: str = "chromium") -> AsyncGenerator[Page, None]:
         """Get a browser page with automatic cleanup."""
         if headless is None:
             headless = settings.headless
@@ -66,11 +66,11 @@ class BrowserManager:
             "--single-process",
         ]
 
-        # Ubuntu-compatible user agent
+        # More compatible user agent for Slack
         user_agent = (
             "Mozilla/5.0 (X11; Linux x86_64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
+            "Chrome/131.0.0.0 Safari/537.36"
         )
 
         async with async_playwright() as p:
@@ -102,7 +102,18 @@ class BrowserManager:
                     },
                 )
             else:
-                browser = await p.chromium.launch(headless=headless, args=browser_args)
+                if browser_type == "firefox":
+                    # Use Firefox for better compatibility with some sites
+                    browser = await p.firefox.launch(headless=headless)
+                    context = await browser.new_context(
+                        viewport={"width": 1280, "height": 720},
+                        user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0",
+                        java_script_enabled=True,
+                        accept_downloads=False,
+                        ignore_https_errors=True,
+                    )
+                else:
+                    browser = await p.chromium.launch(headless=headless, args=browser_args)
                 context = await browser.new_context(
                     viewport={"width": 1280, "height": 720},
                     user_agent=user_agent,
