@@ -1,110 +1,137 @@
-"""Mock storage implementation (simulating DynamoDB)."""
+"""Mock storage implementation for testing and development."""
 
-import json
+import logging
+from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional
 
-from ..models import AuthSession, AuthProvider
+from .base import SessionStorage
+from src.models import SessionCookie
+from src.config import settings
+
+logger = logging.getLogger(__name__)
 
 
-class MockStorage:
-    """Mock storage that simulates DynamoDB using local JSON file."""
+class MockSessionStorage(SessionStorage):
+    """Mock implementation of session storage for testing."""
 
-    def __init__(self, storage_file: str = "sessions.json"):
-        self.storage_file = Path(storage_file)
+    def __init__(self):
+        self.sessions: Dict[str, Dict[str, Any]] = {}
 
-    async def save_session(self, session: AuthSession) -> bool:
-        """Save authentication session."""
+    async def store_session(
+        self, 
+        session_id: str, 
+        provider: str, 
+        cookies: List[SessionCookie],
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> bool:
+        """Store session data in memory."""
         try:
-            sessions = await self._load_sessions()
-            sessions[session.session_id] = session.dict()
-            await self._save_sessions(sessions)
+            # Convert cookies to serializable format
+            cookies_data = []
+            for cookie in cookies:
+                cookies_data.append({
+                    'name': cookie.name,
+                    'value': cookie.value,
+                    'domain': cookie.domain,
+                    'path': cookie.path,
+                    'secure': cookie.secure,
+                    'http_only': cookie.http_only
+                })
+
+            self.sessions[session_id] = {
+                'session_id': session_id,
+                'provider': provider,
+                'cookies': cookies_data,
+                'metadata': metadata or {},
+                'created_at': datetime.utcnow().isoformat(),
+                'last_accessed': datetime.utcnow().isoformat()
+            }
+
+            logger.info(f"Session {session_id} stored successfully in mock storage")
             return True
-        except Exception:
+
+        except Exception as e:
+            logger.error(f"Failed to store session {session_id} in mock storage: {e}")
             return False
 
-    async def get_session(self, session_id: str) -> Optional[AuthSession]:
-        """Get session by ID."""
+    async def get_session(
+        self, 
+        session_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Retrieve session data from memory."""
         try:
-            sessions = await self._load_sessions()
-            session_data = sessions.get(session_id)
-            if session_data:
-                return AuthSession(**session_data)
+            if session_id not in self.sessions:
+                logger.info(f"Session {session_id} not found in mock storage")
+                return None
+
+            session = self.sessions[session_id]
+            
+            # Update last accessed time
+            session['last_accessed'] = datetime.utcnow().isoformat()
+            
+            logger.info(f"Session {session_id} retrieved successfully from mock storage")
+            return session
+
+        except Exception as e:
+            logger.error(f"Failed to retrieve session {session_id} from mock storage: {e}")
             return None
-        except Exception:
-            return None
 
-    async def _load_sessions(self) -> Dict:
-        """Load sessions from file."""
-        if not self.storage_file.exists():
-            return {}
-
+    async def list_active_sessions(
+        self, 
+        provider: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """List active sessions from memory."""
         try:
-            with open(self.storage_file, "r") as f:
-                return json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError):
-            return {}
+            current_time = datetime.utcnow()
+            active_sessions = []
+            
+            for session in self.sessions.values():
+                try:
+                    last_accessed = datetime.fromisoformat(session['last_accessed'])
+                    if current_time - last_accessed < timedelta(minutes=settings.session_timeout_minutes):
+                        if provider is None or session['provider'] == provider:
+                            active_sessions.append(session)
+                except (KeyError, ValueError):
+                    # Skip sessions with invalid timestamps
+                    continue
 
-    async def _save_sessions(self, sessions: Dict) -> None:
-        """Save sessions to file."""
-        with open(self.storage_file, "w") as f:
-            json.dump(sessions, f, default=str, indent=2)
+            logger.info(f"Found {len(active_sessions)} active sessions in mock storage")
+            return active_sessions
 
-    async def get_sessions_by_provider(self, provider: str) -> List[AuthSession]:
-        """Get all sessions for a specific provider."""
-        try:
-            sessions = await self._load_sessions()
-            provider_sessions = []
-            for session_data in sessions.values():
-                if session_data.get('provider') == provider:
-                    provider_sessions.append(AuthSession(**session_data))
-            return provider_sessions
-        except Exception:
+        except Exception as e:
+            logger.error(f"Failed to list sessions from mock storage: {e}")
             return []
 
-    async def get_sessions_by_email(self, email: str) -> List[AuthSession]:
-        """Get all sessions for a specific email."""
+    async def delete_session(
+        self, 
+        session_id: str
+    ) -> bool:
+        """Delete session data from memory."""
         try:
-            sessions = await self._load_sessions()
-            email_sessions = []
-            for session_data in sessions.values():
-                if session_data.get('user_email') == email:
-                    email_sessions.append(AuthSession(**session_data))
-            return email_sessions
-        except Exception:
-            return []
-
-    async def update_session(self, session_id: str, updates: Dict) -> bool:
-        """Update session in storage."""
-        try:
-            sessions = await self._load_sessions()
-            if session_id in sessions:
-                session_data = sessions[session_id]
-                # Update the session data
-                for key, value in updates.items():
-                    if key == 'last_used' and hasattr(value, 'isoformat'):
-                        session_data[key] = value.isoformat()
-                    elif key == 'oauth_tokens' and value is not None:
-                        session_data[key] = value.dict() if hasattr(value, 'dict') else value
-                    else:
-                        session_data[key] = value
-                
-                sessions[session_id] = session_data
-                await self._save_sessions(sessions)
+            if session_id in self.sessions:
+                del self.sessions[session_id]
+                logger.info(f"Session {session_id} deleted successfully from mock storage")
                 return True
-            return False
-        except Exception:
+            else:
+                logger.info(f"Session {session_id} not found in mock storage")
+                return False
+
+        except Exception as e:
+            logger.error(f"Failed to delete session {session_id} from mock storage: {e}")
             return False
 
-    async def delete_session(self, session_id: str) -> bool:
-        """Delete session from storage."""
-        try:
-            sessions = await self._load_sessions()
-            if session_id in sessions:
-                del sessions[session_id]
-                await self._save_sessions(sessions)
-                return True
+    async def is_session_valid(
+        self, 
+        session_id: str
+    ) -> bool:
+        """Check if session is still valid."""
+        session_data = await self.get_session(session_id)
+        if not session_data:
             return False
-        except Exception:
+
+        try:
+            last_accessed = datetime.fromisoformat(session_data['last_accessed'])
+            current_time = datetime.utcnow()
+            return current_time - last_accessed < timedelta(minutes=settings.session_timeout_minutes)
+        except (KeyError, ValueError):
             return False
