@@ -21,19 +21,33 @@ class AuthProvider(str, Enum):
 
 
 class LoginRequest(BaseModel):
-    """Login request model."""
+    """Login request model with OAuth2 support."""
     provider: AuthProvider
     email: str
     password: str
     headless: bool = True
-    # Optional OAuth mode (only if you have an app for the provider)
+    
+    # Authentication mode
+    auth_mode: str = "password"  # "password", "oauth2", "hybrid"
+    
+    # OAuth2 Configuration
     client_id: Optional[str] = None
     client_secret: Optional[str] = None
     redirect_uri: Optional[str] = None
     scopes: Optional[List[str]] = None
-    # Optional direct OTP inputs (future 2FA extension)
+    state: Optional[str] = None  # OAuth2 state parameter
+    
+    # 2FA Configuration
     otp_code: Optional[str] = None
-    otp_secret: Optional[str] = None  # use pyotp if provided
+    totp_secret: Optional[str] = None  # TOTP secret for pyotp
+    
+    # Session Configuration
+    session_reuse: bool = True
+    session_timeout_minutes: Optional[int] = None
+    
+    # Browser Configuration
+    user_agent: Optional[str] = None
+    proxy_config: Optional[Dict[str, str]] = None
 
 
 class LoginResponse(BaseModel):

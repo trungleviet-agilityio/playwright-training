@@ -8,7 +8,8 @@ from typing import Dict
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 
-from .auth import AuthStrategyFactory, BrowserManager
+from .auth import AuthStrategyFactory
+from .browser import BrowserManager
 from .config import settings
 from .models import AuthProvider, LoginRequest, LoginResponse, AuthSession, OAuthTokens  # noqa: F401
 from .storage import MockStorage
@@ -58,52 +59,28 @@ async def login(request: LoginRequest):
         # Create authentication strategy
         auth_strategy = auth_factory.create_strategy(request.provider)
 
-        # Perform authentication
-        async with browser_manager.get_page(headless=request.headless) as page:
-            success, cookies, message = await auth_strategy.authenticate(page, request)
+        # Perform authentication with enhanced browser management
+        async with browser_manager.get_page(
+            headless=request.headless,
+            captcha_solving=True,  # Enable CAPTCHA solving by default
+            browser_type=settings.browser_type,
+        ) as page:
+            success, cookies, message, oauth_tokens = await auth_strategy.authenticate(page, request)
 
         # Calculate execution time
         end_time = datetime.utcnow()
         execution_time = (end_time - start_time).total_seconds() * 1000
 
         if success:
-            # Parse OAuth tokens from message if present
-            oauth_tokens = None
-            access_token = None
-            refresh_token = None
-            token_type = None
-            expires_in = None
+            # Extract OAuth tokens if available
+            access_token = oauth_tokens.access_token if oauth_tokens else None
+            refresh_token = oauth_tokens.refresh_token if oauth_tokens else None
+            token_type = oauth_tokens.token_type if oauth_tokens else None
+            expires_in = oauth_tokens.expires_in if oauth_tokens else None
 
-            if message.startswith("oauth_token:"):
-                # Extract OAuth token from message
-                token_data = message.split("oauth_token:", 1)[1]
-                try:
-                    # Try to parse as JSON if it contains multiple tokens
-                    import json
-                    token_info = json.loads(token_data)
-                    oauth_tokens = OAuthTokens(
-                        access_token=token_info.get("access_token"),
-                        refresh_token=token_info.get("refresh_token"),
-                        token_type=token_info.get("token_type", "Bearer"),
-                        expires_in=token_info.get("expires_in"),
-                        expires_at=datetime.utcnow() + timedelta(seconds=token_info.get("expires_in", 3600)) if token_info.get("expires_in") else None,
-                        scope=token_info.get("scope")
-                    )
-                except (json.JSONDecodeError, ValueError):
-                    # Fallback: treat as simple access token
-                    oauth_tokens = OAuthTokens(
-                        access_token=token_data,
-                        token_type="Bearer",
-                        expires_in=3600,
-                        expires_at=datetime.utcnow() + timedelta(hours=1)
-                    )
-                
-                # Set response values
-                access_token = oauth_tokens.access_token
-                refresh_token = oauth_tokens.refresh_token
-                token_type = oauth_tokens.token_type
-                expires_in = oauth_tokens.expires_in
-                message = "Login successful (OAuth token acquired)"
+            # Update message for OAuth2 success
+            if oauth_tokens:
+                message = "Login successful (OAuth2 tokens acquired)"
 
             # Create and save session
             session_id = str(uuid.uuid4())
