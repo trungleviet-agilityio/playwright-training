@@ -1,11 +1,8 @@
-"""Constants for the Playwright Auth POC."""
+"""Constants for the Playwright Auth POC"""
 
-# URLs
-SLACK_URL = "https://slack.com/get-started#/createnew"
-GOOGLE_URL = "https://accounts.google.com/signin"
-MICROSOFT_365_URL = "https://account.microsoft.com/account"
-SALESFORCE_URL = "https://login.salesforce.com/services/oauth2/authorize"
-NOTION_URL = "https://www.notion.so/auth/login"
-ATLASSIAN_URL = "https://id.atlassian.com/login"
-GITHUB_URL = "https://github.com/login"
-OKTA_URL = "https://login.okta.com/oauth2/default/v1/authorize"
+# Slack URLs
+SLACK_URL = "https://slack.com/signin"
+SLACK_OAUTH2_URL = "https://slack.com/oauth/v2/authorize"
+SLACK_TOKEN_URL = "https://slack.com/api/oauth.v2.access"
+
+# Add more constants here

@@ -25,6 +25,18 @@ class BrowserManager:
         else:
             self.session_storage = MockSessionStorage()
 
+    async def __aenter__(self):
+        """Async context manager entry."""
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit."""
+        # Cleanup any resources if needed
+        if self._current_provider:
+            # Currently no cleanup needed for providers
+            pass
+        return False
+
     @asynccontextmanager
     async def get_page(
         self,
@@ -166,3 +178,45 @@ class BrowserManager:
         except Exception as e:
             logger.error(f"Error storing session cookies: {e}")
             return False
+    
+    def get_browserbase_config(self) -> Dict[str, Any]:
+        """Get Browserbase configuration based on debug script patterns."""
+        return {
+            "project_id": settings.browserbase_project_id,
+            "browser_settings": {
+                "stealth": settings.browserbase_stealth_mode,
+                "solve_captchas": settings.browserbase_captcha_solving,
+                "captcha_solving": {
+                    "enabled": settings.browserbase_captcha_solving,
+                    "auto_solve": settings.browserbase_auto_solve_captcha,
+                    "timeout": settings.browserbase_captcha_timeout,
+                    "retry_attempts": settings.browserbase_captcha_retry_attempts,
+                    "provider": settings.browserbase_captcha_provider
+                },
+                "fingerprint": {
+                    "devices": ["desktop"],
+                    "locales": ["en-US", "en-GB", "en-CA"],
+                    "operating_systems": ["linux", "windows", "macos"],
+                    "timezones": ["America/New_York", "America/Los_Angeles", "Europe/London"],
+                },
+                "human_behavior": {
+                    "mouse_movements": True,
+                    "typing_patterns": True,
+                    "scroll_behavior": True,
+                    "click_timing": True,
+                },
+                "anti_detection": {
+                    "webrtc_leak_protection": True,
+                    "canvas_fingerprint_randomization": True,
+                    "webgl_fingerprint_spoofing": True,
+                    "font_fingerprint_randomization": True,
+                },
+            },
+            "proxies": [
+                {
+                    "type": "residential",
+                    "geolocation": {"country": "US"},
+                    "rotation": "per-session"
+                }
+            ] if settings.browserbase_use_residential_proxy else None
+        }

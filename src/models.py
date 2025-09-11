@@ -10,14 +10,8 @@ from pydantic import BaseModel
 class AuthProvider(str, Enum):
     """Supported authentication providers."""
 
-    ATLASSIAN = "atlassian"
     SLACK = "slack"
-    GOOGLE = "google"
-    MICROSOFT_365 = "microsoft_365"
-    SALESFORCE = "salesforce"
-    NOTION = "notion"
-    GITHUB = "github"
-    OKTA = "okta"
+    #TODO: Add more providers here
 
 
 class LoginRequest(BaseModel):
@@ -48,6 +42,18 @@ class LoginRequest(BaseModel):
     # Browser Configuration
     user_agent: Optional[str] = None
     proxy_config: Optional[Dict[str, str]] = None
+    
+    # Browserbase Stealth Configuration
+    stealth_mode: Optional[str] = None  # "basic", "advanced", or None for default
+    advanced_stealth: Optional[bool] = None  # Enable Advanced Stealth Mode
+    solve_captchas: Optional[bool] = None  # Enable/disable CAPTCHA solving
+    captcha_image_selector: Optional[str] = None  # Custom CAPTCHA image selector
+    captcha_input_selector: Optional[str] = None  # Custom CAPTCHA input selector
+    use_proxies: Optional[bool] = None  # Enable proxy usage for better CAPTCHA success
+    
+    # Slack-specific Configuration
+    workspace_url: Optional[str] = None  # Slack workspace URL (e.g., "company" for company.slack.com)
+    team_id: Optional[str] = None  # Slack team ID for pre-selecting workspace
 
 
 class LoginResponse(BaseModel):
@@ -69,6 +75,9 @@ class SessionCookie(BaseModel):
     name: str
     value: str
     domain: str
+    path: str = "/"
+    secure: bool = False
+    http_only: bool = False
 
 
 class OAuthTokens(BaseModel):
@@ -80,6 +89,13 @@ class OAuthTokens(BaseModel):
     expires_in: Optional[int] = None
     expires_at: Optional[datetime] = None
     scope: Optional[str] = None
+    
+    # Additional OAuth metadata
+    team_id: Optional[str] = None  # Slack team ID
+    team_name: Optional[str] = None  # Slack team name
+    user_id: Optional[str] = None  # User ID
+    bot_user_id: Optional[str] = None  # Bot user ID
+    app_id: Optional[str] = None  # App ID
 
 
 class AuthSession(BaseModel):

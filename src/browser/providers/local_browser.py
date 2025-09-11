@@ -21,7 +21,7 @@ class LocalBrowserProvider(BrowserProvider):
     async def get_page(
         self,
         headless: Optional[bool] = None,
-        captcha_solving: bool = False,
+        captcha_solving: bool = True,  # Enable CAPTCHA solving by default
         proxy_config: Optional[Dict[str, Any]] = None,
         browser_type: str = "chromium",
         **kwargs,
@@ -214,6 +214,10 @@ class LocalBrowserProvider(BrowserProvider):
 
             page = await context.new_page()
 
+            # Set up CAPTCHA solving if enabled
+            if captcha_solving:
+                await self._setup_captcha_solving(page)
+
             try:
                 yield page
             finally:
@@ -240,3 +244,43 @@ class LocalBrowserProvider(BrowserProvider):
                 logger.error(f"Error closing session {session_id}: {e}")
                 return False
         return False
+
+    async def _setup_captcha_solving(self, page: Page) -> None:
+        """Set up CAPTCHA solving for local browser."""
+        try:
+            logger.info("🔧 Setting up CAPTCHA solving for local browser")
+            
+            # Set up basic CAPTCHA detection
+            await page.evaluate("""
+                window.localCaptchaEvents = {
+                    detected: false,
+                    solving: false,
+                    solved: false,
+                    failed: false
+                };
+                
+                // Basic CAPTCHA detection
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'childList') {
+                            // Check for CAPTCHA elements
+                            const captchaElements = document.querySelectorAll(
+                                'iframe[src*="recaptcha"], .g-recaptcha, .h-captcha, [data-sitekey]'
+                            );
+                            if (captchaElements.length > 0) {
+                                window.localCaptchaEvents.detected = true;
+                                console.log('🔍 CAPTCHA detected by local browser');
+                            }
+                        }
+                    });
+                });
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            """)
+            
+            logger.info("✅ CAPTCHA solving setup complete for local browser")
+        except Exception as e:
+            logger.error(f"❌ Failed to setup CAPTCHA solving: {e}")

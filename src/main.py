@@ -9,10 +9,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 
 from .auth import AuthStrategyFactory
-from .browser import BrowserManager
+from .browser.manager import BrowserManager
 from .config import settings
 from .models import AuthProvider, LoginRequest, LoginResponse, AuthSession, OAuthTokens  # noqa: F401
-from .storage import MockStorage
+from .storage.compatibility import MockStorage
 
 # Configure logging
 logging.basicConfig(
@@ -62,8 +62,11 @@ async def login(request: LoginRequest):
         # Perform authentication with enhanced browser management
         async with browser_manager.get_page(
             headless=request.headless,
-            captcha_solving=True,  # Enable CAPTCHA solving by default
+            captcha_solving=request.solve_captchas if request.solve_captchas is not None else True,
             browser_type=settings.browser_type,
+            # Pass Browserbase-specific configuration
+            captcha_image_selector=request.captcha_image_selector,
+            captcha_input_selector=request.captcha_input_selector,
         ) as page:
             success, cookies, message, oauth_tokens = await auth_strategy.authenticate(page, request)
 
