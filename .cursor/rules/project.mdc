@@ -1,0 +1,71 @@
+---
+description: Rules for the project in secure authentication automation using Playwright, FastAPI, Browserbase (for scalable headless browsers with stealth mode), and AWS/Terraform. Ensures consistency in coding standards, security (no .env exposure), design patterns (Singleton, Factory, Observer), and system design (microservices, load balancing, scalability). References: Technical Stack.docx.
+globs: ["*.py", "*.tf", "Dockerfile", "*.yml", "*.yaml"]
+alwaysApply: true
+---
+
+# Cursor Rules for Project
+# Project Overview: Automate authentication flows for services like Slack, Atlassian, Google Suite, GitHub, Okta, Airtable, and Xero using Playwright (browser automation), FastAPI (APIs), Browserbase (scalable headless sessions with stealth mode), and AWS (Terraform-managed infrastructure). Exclude NetSuite and Microsoft 365 unless explicitly specified.
+
+## General Coding Standards
+- Always adhere to PEP 8 style guidelines for Python code, including 4-space indentation, 79-character line limits, and descriptive variable names (e.g., use `auth_flow_handler` instead of `handler`).
+- Use type hints extensively with `typing` module (e.g., `from typing import Dict, Optional`) for all functions and classes to improve readability and static analysis.
+- Structure code modularly: Use design patterns like Singleton for shared resources (e.g., Playwright/Browserbase session pool), Factory for creating auth handlers per service, and Observer for event-driven notifications (e.g., on auth success/failure or session events).
+- Prioritize async/await syntax for all I/O-bound operations, especially in Playwright, Browserbase, and FastAPI, to ensure non-blocking behavior and scalability.
+- Write comprehensive docstrings for every class, method, and function, including parameters, returns, raises, and examples. Follow Google-style docstrings.
+
+## Security and Authentication Handling
+- Never hard-code credentials, API keys, or secrets in code. Always retrieve them dynamically from AWS KMS (for encryption/decryption) or encrypted DynamoDB tables.
+- Never access, display (e.g., via 'cat', print, or logging), or suggest exposing contents of `.env` or `env` files to mitigate security risks like credential leaks; load configurations securely via `os.environ` or AWS SSM Parameter Store using `boto3` client.
+- For CAPTCHA/2FA handling: Leverage Browserbase stealth mode for automatic CAPTCHA solving and residential proxies; use Playwright selectors and waits (e.g., `page.wait_for_selector`) as fallback for custom interactions. Integrate third-party services like 2Captcha only via AWS Lambda for scalability; do not implement direct solvers.
+- Implement retry mechanisms with exponential backoff (using `asyncio` and `tenacity` library if approved) for transient auth failures, but limit retries to 3-5 to avoid abuse.
+- Ensure all auth flows handle multi-factor authentication (MFA) gracefully: Detect OTP inputs and integrate with secure token retrieval (e.g., via AWS SNS for SMS/email).
+- Use environment variables or AWS SSM Parameter Store for configuration (e.g., `BROWSERBASE_API_KEY`, `BROWSERBASE_PROJECT_ID`); load via `os.environ` or `boto3` client.
+
+## Playwright-Specific Rules
+- Integrate Playwright with Browserbase for scalable cloud sessions; use local Playwright only for debugging with `--headed` flag.
+- Always launch Playwright browsers in headless mode by default (`headless=True`) unless debugging.
+- Use context managers for browser sessions (e.g., `async with playwright.chromium.launch() as browser:`) to ensure proper cleanup and resource management.
+- Prefer CSS selectors over XPath for element location due to better performance; use ARIA roles where possible for accessibility (e.g., `page.locator('[role="textbox"]')`).
+- Handle common auth page patterns: Wait for navigation after form submits (`page.wait_for_url`), and use `page.fill`/`page.click` for inputs. Log screenshots on failure via `page.screenshot`.
+- For service-specific flows (e.g., Okta SAML): Modularize into separate classes inheriting from a base `AuthFlow` class, using Factory pattern to instantiate.
+
+## Browserbase Integration
+- Use Browserbase Python SDK (`pip install browserbase`) for cloud-managed headless browser sessions to scale Playwright automation (e.g., parallel auth flows for Slack, GitHub).[](https://docs.browserbase.com/reference/sdk/python)
+- Prefer async client (`browserbase.aio`) for non-blocking session management; initialize with `BROWSERBASE_API_KEY` and `BROWSERBASE_PROJECT_ID` from `os.environ` (e.g., `async with browserbase.aio.Browserbase(api_key=os.environ["BROWSERBASE_API_KEY"]) as bb:`).[](https://docs.browserbase.com/reference/sdk/python)
+- Connect to sessions via Playwright's CDP: Use `playwright.connect_over_cdp(session.connect_url)` after creating sessions with `await bb.sessions.create(project_id=os.environ["BROWSERBASE_PROJECT_ID"])`; ensure proper cleanup with `browser.close()`.[](https://docs.browserbase.com/reference/sdk/python)
+- Leverage Browserbase stealth mode for anti-bot evasion: Enable fingerprinting tactics and automatic CAPTCHA solving for auth flows (e.g., Okta, GitHub); configure residential proxies via SDK options to bypass geo-restrictions or bot detection.[](https://docs.browserbase.com/introduction)
+- Apply design patterns: Use Factory pattern to create Browserbase sessions per auth handler (e.g., `SlackAuthSessionFactory`); Singleton for a session pool manager to reuse connections; Observer for session events (e.g., ready, error, or CAPTCHA solved).
+- For scalability in AWS: Deploy Browserbase-integrated code in Lambda functions; use SQS for queuing auth tasks to distribute across multiple sessions; monitor via CloudWatch/X-Ray.
+- Handle session lifecycle: Start sessions asynchronously, retrieve session IDs for debugging (e.g., `https://browserbase.com/sessions/{session.id}`), and terminate via SDK (`bb.sessions.terminate`).[](https://docs.browserbase.com/reference/sdk/python)
+- Support advanced features: Use Browserbase for file downloads (e.g., `bb.downloads.get`) or custom extensions if needed for specific auth flows.[](https://docs.browserbase.com/introduction)
+
+## FastAPI and API Design
+- Structure APIs as microservices: Each service (e.g., Slack auth) in its own FastAPI app, with endpoints like `/auth/initiate` and `/auth/callback`.
+- Use dependency injection for shared components (e.g., `Depends` for auth middleware or Browserbase session providers).
+- Implement rate limiting and authentication on APIs using `fastapi-security` or JWT (stored in DynamoDB).
+- Return standardized responses: Use Pydantic models for request/response schemas (e.g., `class AuthResponse(BaseModel): status: str, token: Optional[str]`).
+- Integrate with AWS Lambda: Wrap FastAPI apps in Mangum handler for serverless deployment.
+
+## AWS and Infrastructure Rules
+- All infrastructure must be defined as code using Terraform: Use modules for reusability (e.g., for Lambda + API Gateway + Browserbase API integrations).
+- For scalability: Design with load balancing (ALB/ELB), auto-scaling groups, and S3 for static assets. Use Lambda for short-lived auth tasks with Browserbase.
+- Database: Use DynamoDB for state management (e.g., session tokens); encrypt sensitive fields with KMS.
+- CI/CD: Assume GitHub Actions or AWS CodePipeline; suggest Terraform plans in PRs.
+- Monitoring: Integrate CloudWatch for logs/metrics; use X-Ray for tracing auth flows, including Browserbase session performance.
+
+## Testing and Debugging
+- For API endpoint testing (e.g., FastAPI routes like `/auth/initiate`), provide curl commands for verification instead of generating Python script files. Include examples for common methods (GET, POST) with placeholders for headers/tokens (e.g., `curl -X POST http://localhost:8000/auth/initiate -H "Authorization: Bearer {token}" -d '{"service": "slack"}'`).
+- Write unit tests with pytest for core functions if needed (e.g., mock Playwright/Browserbase with `pytest-playwright`), but prioritize curl for endpoint integration testing using test accounts and mocked externals.
+- For debugging: Suggest logging with `structlog` or Python's `logging` module at INFO level; capture exceptions with Sentry if integrated; include Browserbase session IDs for replay/debugging (e.g., `https://browserbase.com/sessions/{session.id}`).
+- Avoid print statements; use logger instead.
+
+## Exclusions and Constraints
+- Only use libraries from Technical Stack.docx (e.g., Playwright, FastAPI, boto3, Terraform, Browserbase SDK). Do not suggest unapproved ones like Selenium or Flask.
+- Focus exclusively on listed services (Slack, Atlassian, Google Suite, GitHub, Okta, Airtable, Xero); ignore others unless specified.
+- Prioritize system design for high availability: Assume microservices architecture with eventual consistency via SQS queues for async tasks.
+
+## Additional Guidelines
+- When suggesting code, always explain reasoning, potential edge cases (e.g., network timeouts in Playwright/Browserbase, CAPTCHA failures), and how it aligns with design patterns or scalability.
+- Keep code DRY (Don't Repeat Yourself): Refactor common auth logic into utils or base classes.
+- Do not generate Markdown documentation files (e.g., no `*.md` creation like README.md or api-docs.md) after completing any response, code generation, or task; focus solely on code and necessary outputs.
