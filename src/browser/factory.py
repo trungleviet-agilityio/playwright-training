@@ -11,7 +11,6 @@ class BrowserProviderType(str, Enum):
 
     LOCAL = "local"
     BROWSERBASE = "browserbase"
-    CUSTOM_CDP = "custom_cdp"
 
 
 class BrowserProviderFactory:

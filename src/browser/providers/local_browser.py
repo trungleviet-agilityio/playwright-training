@@ -1,8 +1,6 @@
-"""Local browser provider implementation (refactored from existing BrowserManager)."""
-
 import asyncio
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Optional, Dict, Any
+from typing import AsyncGenerator, Optional
 from playwright.async_api import Browser, Page, async_playwright
 from ..base import BrowserProvider
 from ...config import settings
@@ -12,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class LocalBrowserProvider(BrowserProvider):
-    """Local browser provider using Playwright directly."""
+    """Local browser provider using Playwright for Slack OAuth2 authentication."""
 
     def __init__(self):
         self.active_sessions: Dict[str, Browser] = {}
@@ -21,73 +19,27 @@ class LocalBrowserProvider(BrowserProvider):
     async def get_page(
         self,
         headless: Optional[bool] = None,
-        captcha_solving: bool = True,  # Enable CAPTCHA solving by default
-        proxy_config: Optional[Dict[str, Any]] = None,
-        browser_type: str = "chromium",
         **kwargs,
     ) -> AsyncGenerator[Page, None]:
-        """Get a local browser page with automatic cleanup."""
-        if headless is None:
-            headless = settings.headless
+        """Get a local Playwright page for browser automation."""
+        headless = headless if headless is not None else settings.headless
 
-        # Ubuntu-optimized Chromium args
         browser_args = [
             "--disable-blink-features=AutomationControlled",
             "--no-sandbox",
             "--disable-web-security",
             "--disable-infobars",
-            "--disable-extensions",
             "--start-maximized",
-            "--window-size=1280,720",
-            "--disable-dev-shm-usage",
-            "--disable-background-timer-throttling",
-            "--disable-backgrounding-occluded-windows",
-            "--disable-renderer-backgrounding",
-            "--disable-features=TranslateUI",
-            "--disable-ipc-flooding-protection",
-            "--disable-default-apps",
-            "--disable-sync",
-            "--disable-translate",
-            "--hide-scrollbars",
-            "--mute-audio",
-            "--no-first-run",
-            "--disable-logging",
-            "--disable-gpu-logging",
             "--disable-gpu",
-            "--disable-software-rasterizer",
-            "--disable-background-networking",
-            "--disable-client-side-phishing-detection",
-            "--disable-hang-monitor",
-            "--disable-prompt-on-repost",
-            "--metrics-recording-only",
-            "--no-default-browser-check",
-            "--safebrowsing-disable-auto-update",
-            "--password-store=basic",
-            "--use-mock-keychain",
-            "--disable-component-extensions-with-background-pages",
-            "--force-color-profile=srgb",
-            "--memory-pressure-off",
-            "--max_old_space_size=4096",
-            "--disable-setuid-sandbox",
-            "--disable-accelerated-2d-canvas",
-            "--disable-accelerated-jpeg-decoding",
-            "--disable-accelerated-mjpeg-decode",
-            "--disable-accelerated-video-decode",
-            "--disable-gpu-compositing",
-            "--disable-gpu-rasterization",
-            "--disable-gpu-sandbox",
-            "--single-process",
+            "--no-first-run",
         ]
 
-        # More compatible user agent for Slack
         user_agent = (
-            "Mozilla/5.0 (X11; Linux x86_64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/131.0.0.0 Safari/537.36"
         )
 
         async with async_playwright() as p:
-            # Check if we should use a remote endpoint
             if settings.browser_ws_endpoint:
                 logger.info(
                     f"Connecting to remote browser: {settings.browser_ws_endpoint}"
@@ -95,142 +47,72 @@ class LocalBrowserProvider(BrowserProvider):
                 browser = await p.chromium.connect_over_cdp(
                     settings.browser_ws_endpoint
                 )
-                context = await browser.new_context(
-                    viewport={"width": 1280, "height": 720},
-                    user_agent=user_agent,
-                    java_script_enabled=True,
-                    accept_downloads=False,
-                    ignore_https_errors=True,
-                    extra_http_headers={
-                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-                        "Accept-Language": "en-US,en;q=0.9",
-                        "Accept-Encoding": "gzip, deflate, br",
-                        "Cache-Control": "no-cache",
-                        "Pragma": "no-cache",
-                        "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
-                        "Sec-Ch-Ua-Mobile": "?0",
-                        "Sec-Ch-Ua-Platform": '"Linux"',
-                        "Sec-Fetch-Dest": "document",
-                        "Sec-Fetch-Mode": "navigate",
-                        "Sec-Fetch-Site": "none",
-                        "Sec-Fetch-User": "?1",
-                        "Upgrade-Insecure-Requests": "1",
-                    },
-                )
             else:
-                # Launch local browser
-                if browser_type == "firefox":
-                    # Use Firefox for better compatibility with some sites
-                    browser = await p.firefox.launch(headless=headless)
-                    context = await browser.new_context(
-                        viewport={"width": 1280, "height": 720},
-                        user_agent="Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0",
-                        java_script_enabled=True,
-                        accept_downloads=False,
-                        ignore_https_errors=True,
-                    )
-                else:
-                    browser = await p.chromium.launch(
-                        headless=headless, args=browser_args
-                    )
-                    context = await browser.new_context(
-                        viewport={"width": 1280, "height": 720},
-                        user_agent=user_agent,
-                        java_script_enabled=True,
-                        accept_downloads=False,
-                        ignore_https_errors=True,
-                        extra_http_headers={
-                            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-                            "Accept-Language": "en-US,en;q=0.9",
-                            "Accept-Encoding": "gzip, deflate, br",
-                            "Cache-Control": "no-cache",
-                            "Pragma": "no-cache",
-                            "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
-                            "Sec-Ch-Ua-Mobile": "?0",
-                            "Sec-Ch-Ua-Platform": '"Linux"',
-                            "Sec-Fetch-Dest": "document",
-                            "Sec-Fetch-Mode": "navigate",
-                            "Sec-Fetch-Site": "none",
-                            "Sec-Fetch-User": "?1",
-                            "Upgrade-Insecure-Requests": "1",
-                        },
-                    )
+                logger.info("Launching local Chromium browser")
+                browser = await p.chromium.launch(headless=headless, args=browser_args)
 
-            # Simplified stealth script - no duplicate definitions
+            context = await browser.new_context(
+                viewport={"width": 1280, "height": 720},
+                user_agent=user_agent,
+                java_script_enabled=True,
+                accept_downloads=False,
+                ignore_https_errors=True,
+                extra_http_headers={
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache",
+                    "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
+                    "Sec-Ch-Ua-Mobile": "?0",
+                    "Sec-Ch-Ua-Platform": '"Linux"',
+                    "Sec-Fetch-Dest": "document",
+                    "Sec-Fetch-Mode": "navigate",
+                    "Sec-Fetch-Site": "none",
+                    "Sec-Fetch-User": "?1",
+                    "Upgrade-Insecure-Requests": "1",
+                },
+            )
+
             await context.add_init_script(
                 """
-                // Remove webdriver property
-                Object.defineProperty(navigator, 'webdriver', {
-                    get: () => undefined,
-                });
-                
-                // Mock plugins only once
-                Object.defineProperty(navigator, 'plugins', {
-                    get: () => [
-                        {
-                            0: {type: "application/x-google-chrome-pdf", suffixes: "pdf", description: "Portable Document Format"},
-                            description: "Portable Document Format",
-                            filename: "internal-pdf-viewer",
-                            length: 1,
-                            name: "Chrome PDF Plugin"
-                        }
-                    ],
-                });
-                
-                // Mock languages
-                Object.defineProperty(navigator, 'languages', {
-                    get: () => ['en-US', 'en'],
-                });
-                
-                // Mock chrome object
-                window.chrome = {
-                    runtime: {},
-                    loadTimes: function() {},
-                    csi: function() {},
-                    app: {}
-                };
-                
-                // Mock platform
-                Object.defineProperty(navigator, 'platform', {
-                    get: () => 'Linux x86_64',
-                });
-                
-                // Mock hardware concurrency
-                Object.defineProperty(navigator, 'hardwareConcurrency', {
-                    get: () => 4,
-                });
-                
-                // Mock device memory
-                Object.defineProperty(navigator, 'deviceMemory', {
-                    get: () => 8,
-                });
-                
-                // Remove automation indicators
-                delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
-                delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise;
-                delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
-            """
+                Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+                window.chrome = {runtime: {}, loadTimes: function() {}, csi: function() {}, app: {}};
+                Object.defineProperty(navigator, 'platform', {get: () => 'Linux x86_64'});
+                Object.defineProperty(navigator, 'languages', {get: () => ['en-US', 'en']});
+                """
             )
 
             page = await context.new_page()
-
-            # Set up CAPTCHA solving if enabled
-            if captcha_solving:
-                await self._setup_captcha_solving(page)
+            session_id = str(id(page))  # Simple session ID for local browser
+            self.active_sessions[session_id] = browser
 
             try:
+                logger.info("Local browser page created successfully")
                 yield page
+            except Exception as e:
+                logger.error(f"Local browser page error: {e}")
+                try:
+                    await page.screenshot(
+                        path=f"error_local_{session_id}.png", full_page=True
+                    )
+                    logger.info(f"Screenshot saved: error_local_{session_id}.png")
+                except Exception:
+                    pass
+                raise
             finally:
                 await context.close()
-                # Only close when locally launched
                 if not settings.browser_ws_endpoint:
                     await browser.close()
+                self.active_sessions.pop(session_id, None)
+                logger.info(f"Local browser session {session_id} closed")
 
     async def create_session(self, **kwargs) -> str:
-        """Create a new local browser session."""
-        # For local browsers, sessions are typically short-lived
-        # This could be extended for persistent session management
-        pass
+        """Create a local browser session (short-lived)."""
+        async with self.get_page(**kwargs) as page:
+            session_id = str(id(page))
+            logger.info(f"Local browser session created: {session_id}")
+            return session_id
 
     async def close_session(self, session_id: str) -> bool:
         """Close a local browser session."""
@@ -238,49 +120,10 @@ class LocalBrowserProvider(BrowserProvider):
             try:
                 browser = self.active_sessions[session_id]
                 await browser.close()
-                del self.active_sessions[session_id]
+                self.active_sessions.pop(session_id)
+                logger.info(f"Local browser session {session_id} closed")
                 return True
             except Exception as e:
-                logger.error(f"Error closing session {session_id}: {e}")
+                logger.error(f"Error closing local session {session_id}: {e}")
                 return False
         return False
-
-    async def _setup_captcha_solving(self, page: Page) -> None:
-        """Set up CAPTCHA solving for local browser."""
-        try:
-            logger.info("🔧 Setting up CAPTCHA solving for local browser")
-            
-            # Set up basic CAPTCHA detection
-            await page.evaluate("""
-                window.localCaptchaEvents = {
-                    detected: false,
-                    solving: false,
-                    solved: false,
-                    failed: false
-                };
-                
-                // Basic CAPTCHA detection
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'childList') {
-                            // Check for CAPTCHA elements
-                            const captchaElements = document.querySelectorAll(
-                                'iframe[src*="recaptcha"], .g-recaptcha, .h-captcha, [data-sitekey]'
-                            );
-                            if (captchaElements.length > 0) {
-                                window.localCaptchaEvents.detected = true;
-                                console.log('🔍 CAPTCHA detected by local browser');
-                            }
-                        }
-                    });
-                });
-                
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-            """)
-            
-            logger.info("✅ CAPTCHA solving setup complete for local browser")
-        except Exception as e:
-            logger.error(f"❌ Failed to setup CAPTCHA solving: {e}")

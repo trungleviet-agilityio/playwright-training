@@ -1,9 +1,8 @@
 ---
-description: Rules for the project in secure authentication automation using Playwright, FastAPI, Browserbase (for scalable headless browsers with stealth mode), and AWS/Terraform. Ensures consistency in coding standards, security (no .env exposure), design patterns (Singleton, Factory, Observer), and system design (microservices, load balancing, scalability). References: Technical Stack.docx.
-globs: ["*.py", "*.tf", "Dockerfile", "*.yml", "*.yaml"]
 alwaysApply: true
+description: Rules for the project
+globs: ["*.py", "*.tf", "Dockerfile", "*.yml", "*.yaml"]
 ---
-
 # Cursor Rules for Project
 # Project Overview: Automate authentication flows for services like Slack, Atlassian, Google Suite, GitHub, Okta, Airtable, and Xero using Playwright (browser automation), FastAPI (APIs), Browserbase (scalable headless sessions with stealth mode), and AWS (Terraform-managed infrastructure). Exclude NetSuite and Microsoft 365 unless explicitly specified.
 

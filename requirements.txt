@@ -6,7 +6,9 @@ pydantic>=2.5.0
 pydantic-settings>=2.1.0
 
 # Browser automation and CAPTCHA solving
-browserbase==1.0.5
+browserbase>=1.0.5
+playwright-captcha>=0.1.0  # Enhanced CAPTCHA solving
+pycaptcha-guard-playwright>=1.0.0  # Alternative CAPTCHA solver
 
 # HTTP client
 httpx>=0.25.0
