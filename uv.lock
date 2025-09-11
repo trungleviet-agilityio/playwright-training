@@ -7,18 +7,6 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "2captcha-python"
-version = "1.5.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/40/8e/9126266b3f2020abfc8c058cbb8228a922cdbf6832f38e79b0005bb9f7b5/2captcha_python-1.5.1.tar.gz", hash = "sha256:6d4f496794f67b312c6e33b7a1b1c3cc24c40cf64b6d62c2595d0e35f91ace7c", size = 29437, upload-time = "2025-01-09T14:19:09.488Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/43/07/1da144b72c6d931fafb6f86d81ac12ba957ba6ac71209ac1d7b8c8eba954/2captcha_python-1.5.1-py3-none-any.whl", hash = "sha256:d0a914fac273a2b24500e8f08274a5401822a113622371fa5408aa2726824c27", size = 17834, upload-time = "2025-01-09T14:19:07.82Z" },
-]
-
-[[package]]
 name = "2captcha-python-async"
 version = "1.5.1"
 source = { registry = "https://pypi.org/simple" }
@@ -126,7 +114,7 @@ wheels = [
 
 [[package]]
 name = "browserbase"
-version = "1.4.0"
+version = "1.0.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -136,9 +124,9 @@ dependencies = [
     { name = "sniffio" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/71/df/17ac5e1116ab8f1264c6a9718f935358d20bdcd8ae0e3d1f18fd580cd871/browserbase-1.4.0.tar.gz", hash = "sha256:e2ed36f513c8630b94b826042c4bb9f497c333f3bd28e5b76cb708c65b4318a0", size = 122103, upload-time = "2025-05-16T20:50:40.802Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/17/67/683a5f67d01aff89ebb0d0c11141dd21d3c5d9d7513793f74e65cdf45fb3/browserbase-1.0.5.tar.gz", hash = "sha256:1c8256cb8f6d94838067b2f3cc173a3118c102746c68565b8d2fa4cb10a3e4a9", size = 114527, upload-time = "2024-12-03T17:02:09.712Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/13/4191423982a2ec69dc8c10a1c4b94a50a0861f49be81ffc19621b75841bc/browserbase-1.4.0-py3-none-any.whl", hash = "sha256:ea9f1fb4a88921975b8b9606835c441a59d8ce82ce00313a6d48bbe8e30f79fb", size = 98044, upload-time = "2025-05-16T20:50:39.331Z" },
+    { url = "https://files.pythonhosted.org/packages/02/92/71db66c57076c067e2c0e5fcc71000e64e80e4e4d5166ad409377ac142ac/browserbase-1.0.5-py3-none-any.whl", hash = "sha256:72c4d8269bd830bedde539de894bc372db46d912b7f832952c6bdd77ae5e2387", size = 94218, upload-time = "2024-12-03T17:02:07.364Z" },
 ]
 
 [[package]]
@@ -512,7 +500,6 @@ name = "playwright-auth-poc"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "2captcha-python" },
     { name = "boto3" },
     { name = "browserbase" },
     { name = "fastapi" },
@@ -520,6 +507,7 @@ dependencies = [
     { name = "playwright-captcha" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyotp" },
     { name = "python-dotenv" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -542,16 +530,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "2captcha-python", specifier = ">=1.5.1" },
     { name = "black", marker = "extra == 'dev'", specifier = "==23.11.0" },
     { name = "boto3", specifier = ">=1.34.0" },
-    { name = "browserbase", specifier = "==1.4.0" },
+    { name = "browserbase", specifier = "==1.0.5" },
     { name = "fastapi", specifier = "==0.104.1" },
     { name = "httpx", marker = "extra == 'dev'", specifier = "==0.25.2" },
     { name = "playwright", specifier = "==1.40.0" },
     { name = "playwright-captcha", specifier = ">=0.1.1" },
     { name = "pydantic", specifier = "==2.5.0" },
     { name = "pydantic-settings", specifier = "==2.1.0" },
+    { name = "pyotp", specifier = ">=2.9.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==7.4.3" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = "==0.21.1" },
     { name = "python-dotenv", specifier = "==1.0.0" },
@@ -700,6 +688,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/10/88/c9a028db29f009170db6337a5096476a12448ffce437bbf91458fd5b5767/pyee-11.0.1.tar.gz", hash = "sha256:a642c51e3885a33ead087286e35212783a4e9b8d6514a10a5db4e57ac57b2b29", size = 27877, upload-time = "2023-10-14T17:50:00.259Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7a/40/bfe7fd2cb55ca7dbb4c56e9f0060567c3e84dd9bdf8a782261f1d2d7c32f/pyee-11.0.1-py3-none-any.whl", hash = "sha256:9bcc9647822234f42c228d88de63d0f9ffa881e87a87f9d36ddf5211f6ac977d", size = 15249, upload-time = "2023-10-14T17:49:57.906Z" },
+]
+
+[[package]]
+name = "pyotp"
+version = "2.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/b2/1d5994ba2acde054a443bd5e2d384175449c7d2b6d1a0614dbca3a63abfc/pyotp-2.9.0.tar.gz", hash = "sha256:346b6642e0dbdde3b4ff5a930b664ca82abfa116356ed48cc42c7d6590d36f63", size = 17763, upload-time = "2023-07-27T23:41:03.295Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c3/c0/c33c8792c3e50193ef55adb95c1c3c2786fe281123291c2dbf0eaab95a6f/pyotp-2.9.0-py3-none-any.whl", hash = "sha256:81c2e5865b8ac55e825b0358e496e1d9387c811e85bb40e71a3b29b288963612", size = 13376, upload-time = "2023-07-27T23:41:01.685Z" },
 ]
 
 [[package]]

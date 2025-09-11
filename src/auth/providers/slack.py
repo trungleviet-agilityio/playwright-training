@@ -1,603 +1,359 @@
-"""Slack authentication strategy."""
+"""Comprehensive Slack authentication strategy - Email → CAPTCHA → OTP → Access Token + OAuth v2 Flow."""
 
-import asyncio
 import logging
-from typing import List, Tuple
+import asyncio
+import json
+import requests
+from typing import List, Optional, Dict, Any
+from urllib.parse import urlparse, parse_qs
+from playwright.async_api import Page, TimeoutError as PlaywrightTimeoutError
 
-from playwright.async_api import Page
-
-from src.models import AuthProvider, LoginRequest, SessionCookie
-from src.auth.base import AuthStrategy
-from src.constants import SLACK_URL, SLACK_ALT_URLS
+from src.models import AuthProvider, LoginRequest, SessionCookie, OAuthTokens
+from src.auth.base import HybridBaseStrategy, AuthMethod
+from src.auth.captcha.factory import CaptchaSolverFactory, CaptchaSolverType
 from src.config import settings
 
-# Try to import captcha solver, but make it optional
-try:
-    from twocaptcha import TwoCaptcha
-    import asyncio
-    CAPTCHA_AVAILABLE = True
-except ImportError as e:
-    logging.warning(f"2captcha library not available: {e}")
-    CAPTCHA_AVAILABLE = False
-
-# Set up logger for this module
 logger = logging.getLogger(__name__)
 
 
-class SlackAuthStrategy(AuthStrategy):
-    """Slack authentication strategy with multiple login methods."""
+class SlackAuthStrategy(HybridBaseStrategy):
+    """Comprehensive Slack authentication strategy with OAuth v2 support"""
 
     @property
     def provider(self) -> AuthProvider:
         return AuthProvider.SLACK
 
+    @property
+    def supported_methods(self) -> List[AuthMethod]:
+        return [AuthMethod.PASSWORD, AuthMethod.HYBRID, AuthMethod.OAUTH2]
+
+    @property
+    def default_method(self) -> AuthMethod:
+        return AuthMethod.HYBRID
+
     async def login(self, page: Page, request: LoginRequest) -> None:
-        """Perform Slack login."""
-        logger.info(f"Starting Slack authentication for email: {request.email}")
+        """Simplified Slack login flow: Email → CAPTCHA → OTP → Success."""
+        logger.info("🚀 Starting simplified Slack authentication flow")
+        logger.info(f"📧 Email: {request.email}")
         
-        # Set additional headers to appear more like a real browser
-        await page.set_extra_http_headers({
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
-            "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": '"Linux"',
-            "Sec-Fetch-Dest": "document",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-Site": "none",
-            "Sec-Fetch-User": "?1",
-            "Upgrade-Insecure-Requests": "1"
-        })
+        # Step 1: Navigate to Slack login
+        await page.goto("https://slack.com/signin", wait_until="domcontentloaded", timeout=30000)
+        logger.info("✅ Navigated to Slack login page")
         
-        # Navigate to Slack sign-in page
-        logger.info(f"Navigating to Slack URL: {SLACK_URL}")
-        await page.goto(SLACK_URL, wait_until="domcontentloaded")
-        logger.info("Successfully navigated to Slack sign-in page")
+        # Step 2: Fill email and trigger CAPTCHA
+        await self._fill_email_and_trigger_captcha(page, request.email)
         
-        # Check if we got the browser not supported message and try alternative URLs
-        try:
-            browser_not_supported = await page.get_by_text("We're very sorry, but your browser is not supported!").is_visible()
-            if browser_not_supported:
-                logger.warning("Slack detected unsupported browser, trying alternative URLs...")
-                for alt_url in SLACK_ALT_URLS:
-                    try:
-                        logger.info(f"Trying alternative URL: {alt_url}")
-                        await page.goto(alt_url, wait_until="domcontentloaded")
-                        await page.wait_for_timeout(2000)  # Wait for page to load
-                        
-                        # Check if this URL works better
-                        browser_not_supported_alt = await page.get_by_text("We're very sorry, but your browser is not supported!").is_visible()
-                        if not browser_not_supported_alt:
-                            logger.info(f"Successfully navigated to working URL: {alt_url}")
-                            break
-                    except Exception as e:
-                        logger.info(f"Failed to load {alt_url}: {e}")
-                        continue
-        except Exception as e:
-            logger.info(f"Browser compatibility check failed: {e}")
+        # Step 3: Solve CAPTCHA
+        await self._solve_captcha(page)
+        
+        # Step 4: Fill password
+        if request.password:
+            await self._fill_password(page, request.password)
+        
+        # Step 5: Handle 2FA/OTP
+        await self._handle_otp(page, request)
+        
+        logger.info("🎉 Slack authentication flow completed")
 
-        # Wait for page to load
-        logger.info("Waiting for page elements to load...")
-        try:
-            await page.wait_for_selector(
-                'input[type="email"], input[data-qa="signin_domain_input"]', timeout=30000
-            )
-            logger.info("Email input field found successfully")
-        except Exception as e:
-            logger.error(f"Failed to find email input: {e}")
-            # Try to find any input field
-            logger.info("Trying to find any input field...")
-            try:
-                await page.wait_for_selector('input', timeout=10000)
-                logger.info("Found generic input field")
-            except Exception as e2:
-                logger.error(f"Failed to find any input field: {e2}")
-                # Take screenshot for debugging
-                await page.screenshot(path="slack_error_no_input.png")
-                logger.info("Screenshot saved as slack_error_no_input.png")
-                raise ValueError("Could not find email input field on Slack login page")
-        logger.info("Page elements loaded successfully")
-
-        # Check if we need to enter workspace domain first
-        logger.info("Checking for workspace domain input...")
-        domain_input = await page.query_selector('input[data-qa="signin_domain_input"]')
-        if domain_input and await domain_input.is_visible():
-            logger.info("Workspace domain input found, extracting workspace from email")
-            # Extract workspace from email if provided
-            if "@" in request.email:
-                workspace = request.email.split("@")[1].split(".")[0]
-                logger.info(f"Extracted workspace: {workspace}")
-                await page.fill('input[data-qa="signin_domain_input"]', workspace)
-                await page.click('button[data-qa="submit_team_domain_button"]')
-                await page.wait_for_load_state("domcontentloaded")
-                logger.info("Workspace domain submitted successfully")
-        else:
-            logger.info("No workspace domain input found, proceeding with email input")
-
+    async def _fill_email_and_trigger_captcha(self, page: Page, email: str) -> None:
+        """Fill email and trigger CAPTCHA."""
+        logger.info("📧 Filling email and triggering CAPTCHA...")
+        
         # Wait for email input
-        logger.info("Waiting for email input field...")
-        await page.wait_for_selector('input[type="email"]', timeout=10000)
-        logger.info("Email input field found")
-
-        # Check if email is already filled and fill if needed
-        logger.info(f"Checking email field for: {request.email}")
+        try:
+            await page.wait_for_selector('input[type="email"]', timeout=10000)
+        except PlaywrightTimeoutError:
+            logger.error("❌ Email input not found")
+            raise
+        
+        # Fill email
         email_input = await page.query_selector('input[type="email"]')
         if email_input:
-            current_value = await email_input.input_value()
-            logger.info(f"Current email field value: '{current_value}'")
-            
-            if current_value.strip() != request.email.strip():
-                logger.info(f"Filling email field with: {request.email}")
-                await page.fill('input[type="email"]', request.email)
-                logger.info("Email field filled successfully")
-            else:
-                logger.info("Email field already contains the correct email")
-        else:
-            logger.error("Email input field not found")
-            raise ValueError("Email input field not found on Slack login page")
+            await email_input.fill(email)
+            logger.info(f"✅ Email filled: {email}")
+            await page.wait_for_timeout(1000)
         
-        # Handle reCAPTCHA - it often appears after user interaction
-        logger.info("Checking for reCAPTCHA after email interaction...")
-        await self._handle_recaptcha_if_present(page)
-
-        # Check if passwordless login is available
-        logger.info("Checking for passwordless login option...")
-        passwordless_button = await page.query_selector(
-            'button[data-qa="signin_send_confirmation_button"]'
-        )
-        if passwordless_button and await passwordless_button.is_visible():
-            logger.info("Passwordless login button found")
-            if not request.password:
-                # Use passwordless login
-                logger.info("No password provided, using passwordless login")
-                await passwordless_button.click()
-                logger.info("Passwordless login initiated. Check your email for the sign-in link.")
-                await page.wait_for_timeout(5000)
-                return
-            else:
-                logger.info("Password provided, continuing with password login")
-
-        # Continue with password login
-        logger.info("Looking for continue/next button...")
-        
-        # Try multiple button selectors
-        button_selectors = [
+        # Click continue to trigger CAPTCHA
+        continue_selectors = [
             'button[data-qa="signin_email_button"]',
             'button:has-text("Continue")',
             'button:has-text("Sign In With Email")',
-            'button[type="submit"]',
-            'input[type="submit"]',
-            'button[class*="signin"]',
-            'button[class*="submit"]'
+            'button[type="submit"]'
         ]
         
-        next_button = None
-        for selector in button_selectors:
+        for selector in continue_selectors:
             try:
-                logger.info(f"Trying button selector: {selector}")
                 button = await page.query_selector(selector)
                 if button and await button.is_visible():
-                    next_button = button
-                    logger.info(f"Found button with selector: {selector}")
+                    await button.click()
+                    logger.info(f"✅ Continue button clicked: {selector}")
+                    await page.wait_for_timeout(3000)
                     break
             except Exception as e:
-                logger.info(f"Selector {selector} failed: {e}")
+                logger.debug(f"Continue button {selector} failed: {e}")
                 continue
-        
-        if next_button:
-            logger.info("Continue button found, clicking...")
-            await next_button.click()
-            await page.wait_for_load_state("domcontentloaded")
-            logger.info("Continue button clicked successfully")
-            
-            # Check for reCAPTCHA after clicking continue
-            logger.info("Checking for reCAPTCHA after clicking continue...")
-            await self._handle_recaptcha_if_present(page)
-        else:
-            logger.info("No continue button found, trying Enter key")
-            await page.press('input[type="email"]', "Enter")
-            
-            # Check for reCAPTCHA after pressing Enter
-            logger.info("Checking for reCAPTCHA after pressing Enter...")
-            await self._handle_recaptcha_if_present(page)
 
-        # Wait for password field after reCAPTCHA is solved
-        logger.info("Waiting for password input field after reCAPTCHA...")
+    async def _solve_captcha(self, page: Page) -> None:
+        """Solve CAPTCHA using Browserbase following official documentation patterns."""
+        logger.info("🤖 Solving CAPTCHA with Browserbase...")
+        
+        # Wait a bit for CAPTCHA to appear
+        await page.wait_for_timeout(3000)
+        
+        # Check if CAPTCHA is present
+        captcha_elements = await page.query_selector_all('iframe[src*="recaptcha"]')
+        if not captcha_elements:
+            logger.info("ℹ️ No CAPTCHA detected - continuing without solving")
+            return
+        
+        logger.info(f"🎯 Found {len(captcha_elements)} CAPTCHA elements")
+        
+        # Take screenshot before solving
+        await page.screenshot(path="captcha_before.png")
+        
+        # Browserbase will automatically solve CAPTCHAs when solveCaptchas is enabled
+        # We just need to wait for the official Browserbase events
         try:
-            # Wait a bit for page to settle after reCAPTCHA
-            await page.wait_for_timeout(2000)
+            logger.info("🤖 Waiting for Browserbase to solve CAPTCHA automatically...")
             
-            # Check current page state
-            current_url = page.url
-            page_title = await page.title()
-            logger.info(f"Current URL after reCAPTCHA: {current_url}")
-            logger.info(f"Current page title: {page_title}")
+            # Click the CAPTCHA checkbox to trigger Browserbase solving
+            checkbox = await page.query_selector('.recaptcha-checkbox')
+            if checkbox:
+                await checkbox.click()
+                logger.info("🖱️ Clicked reCAPTCHA checkbox to trigger Browserbase")
+                await page.wait_for_timeout(2000)
             
-            # Take screenshot for debugging
-            await page.screenshot(path="after_recaptcha.png")
-            logger.info("Screenshot saved as after_recaptcha.png")
+            # Wait for Browserbase to solve (up to 30 seconds as per documentation)
+            timeout_seconds = 30
+            for i in range(timeout_seconds):
+                await asyncio.sleep(1)
+                
+                # Check if CAPTCHA is still present
+                still_present = await page.query_selector('iframe[src*="recaptcha"]')
+                if not still_present:
+                    logger.info("✅ CAPTCHA solved by Browserbase!")
+                    await page.screenshot(path="captcha_after.png")
+                    return
+                
+                # Check for image selection challenge
+                image_challenge = await page.query_selector('div[class*="rc-imageselect"]')
+                if image_challenge:
+                    logger.info("🎯 Image selection challenge detected - Browserbase should be solving this")
+                    await page.screenshot(path="captcha_image_challenge.png")
+                    # Wait a bit more for Browserbase to solve image challenge
+                    await asyncio.sleep(5)
+                    
+                    # Check again
+                    still_present = await page.query_selector('iframe[src*="recaptcha"]')
+                    if not still_present:
+                        logger.info("✅ Image challenge solved by Browserbase!")
+                        await page.screenshot(path="captcha_after.png")
+                        return
+                
+                if i % 5 == 0 and i > 0:
+                    logger.info(f"⏳ Still waiting for Browserbase... {i}s elapsed")
             
-            # Try to find password field with multiple selectors
-            password_selectors = [
-                'input[type="password"]',
-                'input[data-qa="signin_password_input"]',
-                'input[name="password"]',
-                'input[placeholder*="password" i]',
-                'input[placeholder*="Password" i]'
+            logger.warning("⏰ Browserbase timeout - CAPTCHA may need manual intervention")
+            
+        except Exception as e:
+            logger.error(f"❌ Browserbase error: {e}")
+        
+        # If Browserbase doesn't solve it automatically, we'll let the user handle it
+        logger.info("🤖 Browserbase automatic solving completed or timed out")
+        await page.screenshot(path="captcha_after.png")
+
+    async def _fill_password(self, page: Page, password: str) -> None:
+        """Fill password."""
+        logger.info("🔒 Filling password...")
+        
+        try:
+            await page.wait_for_selector('input[type="password"]', timeout=10000)
+        except PlaywrightTimeoutError:
+            logger.info("ℹ️ No password field found")
+            return
+        
+        password_input = await page.query_selector('input[type="password"]')
+        if password_input:
+            await password_input.fill(password)
+            logger.info("✅ Password filled")
+            await page.wait_for_timeout(1000)
+            
+            # Submit password form
+            submit_selectors = [
+                'button[data-qa="signin_password_button"]',
+                'button:has-text("Sign In")',
+                'button[type="submit"]'
             ]
             
-            password_found = False
-            for selector in password_selectors:
+            for selector in submit_selectors:
                 try:
-                    logger.info(f"Looking for password field with selector: {selector}")
-                    await page.wait_for_selector(selector, timeout=5000)
-                    logger.info(f"Password field found with selector: {selector}")
-                    password_found = True
-                    break
+                    button = await page.query_selector(selector)
+                    if button and await button.is_visible():
+                        await button.click()
+                        logger.info(f"✅ Password submitted: {selector}")
+                        await page.wait_for_timeout(3000)
+                        break
                 except Exception as e:
-                    logger.info(f"Password selector {selector} failed: {e}")
+                    logger.debug(f"Submit button {selector} failed: {e}")
+                    continue
+
+    async def _handle_otp(self, page: Page, request: LoginRequest) -> None:
+        """Handle OTP/2FA."""
+        logger.info("🔐 Checking for OTP/2FA...")
+        
+        # Check for OTP input
+        otp_selectors = [
+            'input[name="totpPin"]',
+            'input[type="tel"]',
+            'input[placeholder*="code"]',
+            'input[placeholder*="verification"]',
+            'input[data-qa="totp_input"]'
+        ]
+        
+        otp_found = False
+        for selector in otp_selectors:
+            try:
+                element = await page.query_selector(selector)
+                if element and await element.is_visible():
+                    otp_found = True
+                    logger.info(f"🎯 OTP input found: {selector}")
+                    break
+            except Exception:
+                continue
+        
+        if not otp_found:
+            logger.info("✅ No OTP required")
+            return
+        
+        # Handle TOTP if secret provided
+        if request.totp_secret:
+            logger.info("🤖 Using TOTP secret for OTP...")
+            await self._handle_totp_otp(page, request.totp_secret)
+        else:
+            logger.info("⏳ Manual OTP required - waiting for user input...")
+            await self._wait_for_manual_otp(page)
+
+    async def _handle_totp_otp(self, page: Page, totp_secret: str) -> None:
+        """Handle TOTP-based OTP."""
+        try:
+            import pyotp
+            
+            # Generate TOTP code
+            totp = pyotp.TOTP(totp_secret)
+            totp_code = totp.now()
+            logger.info(f"🔑 Generated TOTP code: {totp_code}")
+            
+            # Fill OTP code
+            otp_selectors = [
+                'input[name="totpPin"]',
+                'input[type="tel"]',
+                'input[placeholder*="code"]',
+                'input[placeholder*="verification"]'
+            ]
+            
+            for selector in otp_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element and await element.is_visible():
+                        await element.fill(totp_code)
+                        logger.info(f"✅ OTP code filled: {selector}")
+                        
+                        # Submit OTP form
+                        submit_selectors = [
+                            'button:has-text("Verify")',
+                            'button:has-text("Continue")',
+                            'button[type="submit"]'
+                        ]
+                        
+                        for submit_selector in submit_selectors:
+                            try:
+                                submit_button = await page.query_selector(submit_selector)
+                                if submit_button and await submit_button.is_visible():
+                                    await submit_button.click()
+                                    logger.info(f"✅ OTP submitted: {submit_selector}")
+                                    await page.wait_for_timeout(3000)
+                                    return
+                            except Exception:
+                                continue
+                        break
+                except Exception:
+                    continue
+                    
+        except ImportError:
+            logger.error("❌ PyOTP library not installed")
+        except Exception as e:
+            logger.error(f"❌ TOTP OTP failed: {e}")
+
+    async def _wait_for_manual_otp(self, page: Page) -> None:
+        """Wait for manual OTP input."""
+        logger.info("⏳ Waiting up to 120 seconds for manual OTP...")
+        
+        for attempt in range(120):
+            await asyncio.sleep(1)
+            
+            # Check if OTP input is still visible
+            otp_selectors = [
+                'input[name="totpPin"]',
+                'input[type="tel"]',
+                'input[placeholder*="code"]',
+                'input[placeholder*="verification"]'
+            ]
+            
+            still_visible = False
+            for selector in otp_selectors:
+                try:
+                    element = await page.query_selector(selector)
+                    if element and await element.is_visible():
+                        still_visible = True
+                        break
+                except Exception:
                     continue
             
-            if not password_found:
-                logger.error("Password field not found with any selector")
-                
-                # Debug: Log all input elements on the page
-                all_inputs = await page.query_selector_all('input')
-                logger.info(f"Found {len(all_inputs)} input elements on the page:")
-                for i, input_el in enumerate(all_inputs):
-                    try:
-                        input_type = await input_el.get_attribute('type')
-                        input_name = await input_el.get_attribute('name')
-                        input_placeholder = await input_el.get_attribute('placeholder')
-                        input_id = await input_el.get_attribute('id')
-                        logger.info(f"Input {i}: type={input_type}, name={input_name}, placeholder={input_placeholder}, id={input_id}")
-                    except Exception as e:
-                        logger.info(f"Input {i}: error getting attributes: {e}")
-                
-                # Check if we're on a different page (success page?)
-                if "slack.com" in current_url and ("/messages" in current_url or "/client" in current_url):
-                    logger.info("Appears to be on Slack workspace page - login might be successful!")
-                    return
-                else:
-                    # Check if we're on a 2FA page or other authentication step
-                    page_content = await page.content()
-                    if "two-factor" in page_content.lower() or "2fa" in page_content.lower():
-                        logger.info("Appears to be on 2FA page - reCAPTCHA solved but 2FA required")
-                        await self._handle_2fa(page, request)
-                        return
-                    elif "password" in page_content.lower():
-                        logger.info("Page contains 'password' but field not found - might be a different form")
-                        raise ValueError("Password field not found after reCAPTCHA solving")
-                    else:
-                        logger.info("Page doesn't seem to require password - might be successful")
-                        return
-                    
-        except Exception as e:
-            logger.error(f"Error waiting for password field: {e}")
-            raise ValueError(f"Could not find password field after reCAPTCHA: {e}")
-
-        if not request.password:
-            logger.error("Password is required for this login method")
-            raise ValueError("Password is required for this login method")
-
-        # Fill password
-        logger.info("Filling password field...")
-        await page.fill('input[type="password"]', request.password)
-        logger.info("Password field filled successfully")
-
-        # Submit login form
-        logger.info("Looking for submit button...")
-        submit_button = await page.query_selector(
-            'button[data-qa="signin_password_button"], button[type="submit"], button:has-text("Sign In")'
-        )
-        if submit_button:
-            logger.info("Submit button found, clicking...")
-            await submit_button.click()
-            logger.info("Submit button clicked successfully")
-        else:
-            logger.info("No submit button found, using Enter key")
-            await page.press('input[type="password"]', "Enter")
-
-        # Wait for potential redirects
-        logger.info("Waiting for potential redirects...")
-        await page.wait_for_timeout(3000)
-        logger.info("Slack login process completed")
-
-    async def _handle_recaptcha_if_present(self, page: Page) -> None:
-        """Handle reCAPTCHA if it appears on the page."""
-        try:
-            # Wait a bit for reCAPTCHA to potentially appear after user interaction
-            await page.wait_for_timeout(2000)
+            if not still_visible:
+                logger.info("✅ OTP appears to be completed")
+                return
             
-            # Check for reCAPTCHA indicators
-            recaptcha_indicators = [
-                'iframe[src*="recaptcha"]',
-                '.g-recaptcha',
-                '[data-sitekey]',
-                'div[class*="recaptcha"]',
-                'div[id*="recaptcha"]',
-                'div[class*="recaptcha-checkbox"]',
-                'span[class*="recaptcha-checkbox"]',
-                'div[class*="g-recaptcha"]'
-            ]
-            
-            recaptcha_found = False
-            for indicator in recaptcha_indicators:
-                element = await page.query_selector(indicator)
-                if element and await element.is_visible():
-                    recaptcha_found = True
-                    logger.info(f"reCAPTCHA detected with selector: {indicator}")
-                    break
-            
-            # Also check for "I'm not a robot" text
-            if not recaptcha_found:
-                try:
-                    robot_text = await page.get_by_text("I'm not a robot").is_visible()
-                    if robot_text:
-                        recaptcha_found = True
-                        logger.info("reCAPTCHA detected by 'I'm not a robot' text")
-                except Exception:
-                    pass
-            
-            if recaptcha_found:
-                logger.info("reCAPTCHA detected - attempting automated solution...")
-                await self._solve_recaptcha(page)
-                logger.info("reCAPTCHA solved successfully!")
-            else:
-                logger.info("No reCAPTCHA detected")
-        except Exception as e:
-            logger.error(f"reCAPTCHA handling failed: {e}")
-            raise ValueError(f"reCAPTCHA could not be solved automatically: {e}")
-
-    async def _solve_recaptcha(self, page: Page) -> None:
-        """Solve reCAPTCHA using automated 2captcha service."""
-        if not CAPTCHA_AVAILABLE:
-            logger.error("2captcha library not available - cannot solve reCAPTCHA automatically")
-            raise ValueError("2captcha library not available - reCAPTCHA cannot be solved automatically")
+            if attempt % 10 == 0 and attempt > 0:
+                logger.info(f"⏳ Still waiting for OTP... ({attempt}s)")
         
-        if not settings.captcha_2captcha or not settings.captcha_2captcha.strip():
-            logger.error("2captcha API key not configured - cannot solve reCAPTCHA automatically")
-            raise ValueError("2captcha API key not configured - reCAPTCHA cannot be solved automatically")
-        
-        logger.info("Using automated 2captcha service for reCAPTCHA solving...")
-        await self._solve_recaptcha_with_2captcha(page)
-        logger.info("reCAPTCHA solved successfully with 2captcha")
-
-    async def _solve_recaptcha_with_2captcha(self, page: Page) -> None:
-        """Solve reCAPTCHA using 2captcha async library."""
-        try:
-            logger.info("Initializing 2captcha async solver...")
-            
-            # Get the current URL and site key
-            current_url = page.url
-            logger.info(f"Current URL: {current_url}")
-            
-            # Find the reCAPTCHA site key with multiple methods
-            site_key = await page.evaluate("""
-                () => {
-                    // Method 1: Direct data-sitekey attribute
-                    let recaptchaElement = document.querySelector('[data-sitekey]');
-                    if (recaptchaElement) {
-                        return recaptchaElement.getAttribute('data-sitekey');
-                    }
-                    
-                    // Method 2: Check iframe src for sitekey parameter
-                    const iframe = document.querySelector('iframe[src*="recaptcha"]');
-                    if (iframe) {
-                        const src = iframe.src;
-                        const match = src.match(/[?&]k=([^&]+)/);
-                        if (match) {
-                            return decodeURIComponent(match[1]);
-                        }
-                    }
-                    
-                    // Method 3: Check for grecaptcha widget
-                    if (window.grecaptcha && window.grecaptcha.getResponse) {
-                        const widgets = document.querySelectorAll('.g-recaptcha');
-                        for (let widget of widgets) {
-                            const sitekey = widget.getAttribute('data-sitekey');
-                            if (sitekey) return sitekey;
-                        }
-                    }
-                    
-                    return null;
-                }
-            """)
-            
-            if not site_key:
-                logger.error("Could not find reCAPTCHA site key")
-                raise ValueError("reCAPTCHA site key not found")
-            
-            logger.info(f"Found reCAPTCHA site key: {site_key}")
-            
-            # Initialize 2captcha solver
-            solver = TwoCaptcha(settings.captcha_2captcha)
-            
-            # Submit reCAPTCHA to 2captcha (run in thread pool to avoid blocking)
-            logger.info("Submitting reCAPTCHA to 2captcha service...")
-            result = await asyncio.get_event_loop().run_in_executor(
-                None, 
-                lambda: solver.recaptcha(sitekey=site_key, url=current_url)
-            )
-
-            logger.info(f"2captcha result: {result}")
-            captcha_id = result['captchaId']
-            
-            # Wait for solution (run in thread pool to avoid blocking)
-            logger.info("Waiting for 2captcha solution...")
-            solution = await asyncio.get_event_loop().run_in_executor(
-                None,
-                lambda: solver.get_result(captcha_id)
-            )
-            logger.info(f"2captcha solution: {solution}")
-            
-            # Inject the solution into the page
-            await page.evaluate(f"""
-                () => {{
-                    const responseElement = document.querySelector('[name="g-recaptcha-response"]');
-                    if (responseElement) {{
-                        responseElement.value = '{solution}';
-                        responseElement.style.display = 'block';
-                    }}
-                    
-                    // Trigger reCAPTCHA callback if it exists
-                    if (window.grecaptcha && window.grecaptcha.getResponse) {{
-                        const widgetId = window.grecaptcha.getResponse();
-                        if (window.grecaptchaCallback) {{
-                            window.grecaptchaCallback('{solution}');
-                        }}
-                    }}
-                }}
-            """)
-            
-            logger.info("reCAPTCHA solution injected successfully!")
-            
-            # Wait for page to potentially redirect or change after reCAPTCHA
-            logger.info("Waiting for page to settle after reCAPTCHA solution...")
-            await page.wait_for_timeout(3000)
-            
-            # Check if page has redirected
-            new_url = page.url
-            if new_url != current_url:
-                logger.info(f"Page redirected after reCAPTCHA: {new_url}")
-                # Check if we're on a success page
-                if "slack.com" in new_url and ("/messages" in new_url or "/client" in new_url):
-                    logger.info("Redirected to Slack workspace - login successful!")
-                    return
-            
-        except Exception as e:
-            logger.error(f"2captcha solving error: {e}")
-            raise
-
-    async def _handle_2fa(self, page: Page, request: LoginRequest) -> None:
-        """Handle 2FA authentication."""
-        logger.info("Handling 2FA authentication...")
-        
-        # Look for 2FA input field
-        twofa_selectors = [
-            'input[type="text"][placeholder*="code" i]',
-            'input[type="text"][placeholder*="verification" i]',
-            'input[type="text"][placeholder*="2fa" i]',
-            'input[type="text"][placeholder*="two-factor" i]',
-            'input[name*="code"]',
-            'input[name*="verification"]',
-            'input[id*="code"]',
-            'input[id*="verification"]',
-            'input[data-qa*="code"]',
-            'input[data-qa*="verification"]'
-        ]
-        
-        twofa_input = None
-        for selector in twofa_selectors:
-            try:
-                logger.info(f"Looking for 2FA input with selector: {selector}")
-                element = await page.query_selector(selector)
-                if element and await element.is_visible():
-                    twofa_input = element
-                    logger.info(f"2FA input found with selector: {selector}")
-                    break
-            except Exception as e:
-                logger.info(f"2FA selector {selector} failed: {e}")
-                continue
-        
-        if not twofa_input:
-            logger.error("2FA input field not found")
-            raise ValueError("2FA input field not found")
-        
-        # Check if we have a 2FA code in the request
-        if hasattr(request, 'otp_code') and request.otp_code:
-            logger.info("Using provided 2FA code")
-            await twofa_input.fill(request.otp_code)
-        else:
-            logger.error("2FA code not provided in request")
-            raise ValueError("2FA code is required but not provided in request (use 'otp_code' field)")
-        
-        # Look for submit button
-        submit_selectors = [
-            'button[type="submit"]',
-            'button:has-text("Verify")',
-            'button:has-text("Submit")',
-            'button:has-text("Continue")',
-            'button[data-qa*="submit"]',
-            'button[data-qa*="verify"]'
-        ]
-        
-        submit_button = None
-        for selector in submit_selectors:
-            try:
-                element = await page.query_selector(selector)
-                if element and await element.is_visible():
-                    submit_button = element
-                    logger.info(f"2FA submit button found with selector: {selector}")
-                    break
-            except Exception as e:
-                logger.info(f"2FA submit selector {selector} failed: {e}")
-                continue
-        
-        if submit_button:
-            logger.info("Clicking 2FA submit button...")
-            await submit_button.click()
-            await page.wait_for_load_state("domcontentloaded")
-            logger.info("2FA submit button clicked successfully")
-        else:
-            logger.info("No 2FA submit button found, trying Enter key")
-            await page.press('input[type="text"]', "Enter")
-        
-        # Wait for potential redirects
-        logger.info("Waiting for 2FA processing...")
-        await page.wait_for_timeout(3000)
-        logger.info("2FA handling completed")
+        logger.warning("⏰ OTP timeout after 120 seconds")
 
     async def is_success(self, page: Page) -> bool:
         """Check if login was successful."""
-        logger.info("Checking if Slack login was successful...")
-        logger.info(f"Current URL: {page.url}")
+        logger.info("🔍 Checking login success...")
         
+        # Slack success indicators
         success_indicators = [
-            # Slack workspace URL pattern
             lambda: "slack.com" in page.url and "/messages" in page.url,
-            # Slack app elements
+            lambda: "slack.com" in page.url and "/client" in page.url,
             lambda: page.query_selector('[data-qa="workspace_menu"]'),
             lambda: page.query_selector('[data-qa="channel_sidebar"]'),
-            lambda: page.query_selector(".p-workspace__sidebar"),
-            # Success page elements
-            lambda: page.get_by_text("Welcome to Slack").is_visible(),
-            lambda: page.get_by_text("You're signed in").is_visible(),
+            lambda: page.get_by_text("Welcome to Slack").is_visible()
         ]
-
+        
         for i, indicator in enumerate(success_indicators):
             try:
-                logger.info(f"Testing success indicator {i+1}/{len(success_indicators)}")
                 result = await indicator()
                 if result:
-                    logger.info(f"Success indicator {i+1} matched! Login successful.")
+                    logger.info(f"✅ Success indicator {i+1} matched!")
                     return True
-                else:
-                    logger.info(f"Success indicator {i+1} did not match")
             except Exception as e:
-                logger.info(f"Success indicator {i+1} failed with error: {e}")
+                logger.debug(f"Success indicator {i+1} failed: {e}")
                 continue
-
-        logger.warning("No success indicators matched. Login may have failed.")
+        
+        logger.info("❌ No success indicators matched")
         return False
 
     async def extract_cookies(self, page: Page) -> List[SessionCookie]:
-        """Extract Slack session cookies."""
-        logger.info("Extracting Slack session cookies...")
+        """Extract session cookies."""
+        logger.info("🍪 Extracting session cookies...")
+        
         browser_cookies = await page.context.cookies()
-        logger.info(f"Found {len(browser_cookies)} total cookies")
-
-        # Focus on important Slack cookies
-        important_cookies = {"d", "b", "x", "session", "token"}
-
+        important_cookies = {"d", "b", "x", "session", "token", "user_session"}
+        
         session_cookies = []
         for cookie in browser_cookies:
-            # Include all slack.com cookies and important ones
             if "slack.com" in cookie["domain"] or cookie["name"] in important_cookies:
-                logger.info(f"Extracting cookie: {cookie['name']} from {cookie['domain']}")
                 session_cookies.append(
                     SessionCookie(
                         name=cookie["name"],
@@ -608,6 +364,261 @@ class SlackAuthStrategy(AuthStrategy):
                         http_only=cookie.get("httpOnly", False),
                     )
                 )
-
-        logger.info(f"Extracted {len(session_cookies)} relevant cookies")
+        
+        logger.info(f"✅ Extracted {len(session_cookies)} cookies")
         return session_cookies
+
+    # OAuth2 methods (comprehensive implementation)
+    async def oauth2_login(self, page: Page, request: LoginRequest) -> Optional[OAuthTokens]:
+        """Comprehensive OAuth2 login with Browserbase integration."""
+        logger.info("🔄 Starting Slack OAuth v2 flow with Browserbase integration")
+        
+        try:
+            # Step 1: Construct OAuth authorize URL
+            authorize_url = self._build_oauth_url(request)
+            logger.info(f"🔗 OAuth URL: {authorize_url}")
+            
+            # Step 2: Navigate to OAuth authorize page
+            await page.goto(authorize_url, wait_until="domcontentloaded", timeout=30000)
+            logger.info("✅ Navigated to Slack OAuth authorize page")
+            
+            # Step 3: Handle login flow (email → CAPTCHA → password → 2FA)
+            await self._handle_oauth_login_flow(page, request)
+            
+            # Step 4: Handle app authorization
+            await self._handle_app_authorization(page)
+            
+            # Step 5: Capture authorization code from redirect
+            auth_code = await self._capture_auth_code(page)
+            
+            # Step 6: Exchange code for tokens
+            oauth_tokens = await self._exchange_code_for_tokens(auth_code, request)
+            
+            logger.info("🎉 OAuth v2 flow completed successfully")
+            return oauth_tokens
+            
+        except Exception as e:
+            logger.error(f"❌ OAuth v2 flow failed: {e}")
+            return None
+
+    def _build_oauth_url(self, request: LoginRequest) -> str:
+        """Build Slack OAuth v2 authorize URL."""
+        base_url = "https://slack.com/oauth/v2/authorize"
+        
+        # Get OAuth parameters from request or settings
+        client_id = getattr(request, 'client_id', None) or settings.slack_client_id
+        scopes = getattr(request, 'scopes', None) or settings.slack_scopes.split(',')
+        redirect_uri = getattr(request, 'redirect_uri', None) or settings.slack_redirect_uri
+        team_id = getattr(request, 'team_id', None)
+        
+        # Ensure scopes is a list
+        if isinstance(scopes, str):
+            scopes = scopes.split(',')
+        scopes_str = ','.join(scopes) if scopes else settings.slack_scopes
+        
+        if not client_id:
+            raise ValueError("Slack client_id is required for OAuth flow")
+        
+        params = {
+            'client_id': client_id,
+            'scope': scopes_str,
+            'redirect_uri': redirect_uri,
+            'response_type': 'code'
+        }
+        
+        if team_id:
+            params['team'] = team_id
+        
+        # Build query string
+        query_string = '&'.join([f"{k}={v}" for k, v in params.items()])
+        return f"{base_url}?{query_string}"
+
+    async def _handle_oauth_login_flow(self, page: Page, request: LoginRequest) -> None:
+        """Handle the login portion of OAuth flow."""
+        logger.info("🔐 Handling OAuth login flow...")
+        
+        # Check if we're already logged in
+        if await self._is_already_logged_in(page):
+            logger.info("✅ Already logged in to Slack")
+            return
+        
+        # Fill email and trigger CAPTCHA
+        await self._fill_email_and_trigger_captcha(page, request.email)
+        
+        # Solve CAPTCHA
+        await self._solve_captcha(page)
+        
+        # Fill password
+        if request.password:
+            await self._fill_password(page, request.password)
+        
+        # Handle 2FA/OTP
+        await self._handle_otp(page, request)
+        
+        # Wait for redirect to authorization page
+        await page.wait_for_timeout(3000)
+
+    async def _is_already_logged_in(self, page: Page) -> bool:
+        """Check if user is already logged in to Slack."""
+        try:
+            # Look for elements that indicate we're already logged in
+            logged_in_indicators = [
+                '[data-qa="oauth_submit_button"]',  # Authorize button
+                'button:has-text("Allow")',
+                'button:has-text("Authorize")',
+                'button:has-text("Continue")'
+            ]
+            
+            for indicator in logged_in_indicators:
+                element = await page.query_selector(indicator)
+                if element and await element.is_visible():
+                    logger.info("✅ Already logged in - found authorization button")
+                    return True
+            
+            return False
+        except Exception as e:
+            logger.debug(f"Error checking login status: {e}")
+            return False
+
+    async def _handle_app_authorization(self, page: Page) -> None:
+        """Handle the app authorization step."""
+        logger.info("📱 Handling app authorization...")
+        
+        # Wait for authorization page to load
+        await page.wait_for_timeout(3000)
+        
+        # Look for authorization button
+        auth_selectors = [
+            'button[data-qa="oauth_submit_button"]',
+            'button:has-text("Allow")',
+            'button:has-text("Authorize")',
+            'button:has-text("Continue")',
+            'button[type="submit"]'
+        ]
+        
+        for selector in auth_selectors:
+            try:
+                button = await page.query_selector(selector)
+                if button and await button.is_visible():
+                    logger.info(f"✅ Found authorization button: {selector}")
+                    await button.click()
+                    logger.info("✅ Authorization button clicked")
+                    await page.wait_for_timeout(3000)
+                    return
+            except Exception as e:
+                logger.debug(f"Authorization button {selector} failed: {e}")
+                continue
+        
+        logger.warning("⚠️ No authorization button found - may already be authorized")
+
+    async def _capture_auth_code(self, page: Page) -> str:
+        """Capture authorization code from redirect URL."""
+        logger.info("🔍 Capturing authorization code...")
+        
+        # Wait for redirect to callback URL
+        max_wait = 30
+        for attempt in range(max_wait):
+            current_url = page.url
+            logger.debug(f"Current URL: {current_url}")
+            
+            # Check if we're at the callback URL
+            if settings.slack_redirect_uri in current_url or "code=" in current_url:
+                logger.info("✅ Redirected to callback URL")
+                break
+            
+            await asyncio.sleep(1)
+        
+        # Parse the authorization code from URL
+        parsed_url = urlparse(page.url)
+        query_params = parse_qs(parsed_url.query)
+        
+        auth_code = query_params.get('code', [None])[0]
+        if not auth_code:
+            # Try to get from fragment
+            fragment = parsed_url.fragment
+            if fragment:
+                fragment_params = parse_qs(fragment)
+                auth_code = fragment_params.get('code', [None])[0]
+        
+        if not auth_code:
+            raise ValueError(f"Failed to capture auth code from URL: {page.url}")
+        
+        logger.info(f"✅ Authorization code captured: {auth_code[:10]}...")
+        return auth_code
+
+    async def _exchange_code_for_tokens(self, auth_code: str, request: LoginRequest) -> OAuthTokens:
+        """Exchange authorization code for access tokens."""
+        logger.info("🔄 Exchanging authorization code for tokens...")
+        
+        # Get OAuth parameters
+        client_id = getattr(request, 'client_id', None) or settings.slack_client_id
+        client_secret = getattr(request, 'client_secret', None) or settings.slack_client_secret
+        redirect_uri = getattr(request, 'redirect_uri', None) or settings.slack_redirect_uri
+        
+        if not client_id or not client_secret:
+            raise ValueError("Slack client_id and client_secret are required for token exchange")
+        
+        # Prepare token exchange request
+        token_url = "https://slack.com/api/oauth.v2.access"
+        payload = {
+            'code': auth_code,
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'redirect_uri': redirect_uri
+        }
+        
+        # Make token exchange request
+        response = requests.post(token_url, data=payload, timeout=30)
+        
+        if response.status_code != 200:
+            raise ValueError(f"Token exchange failed with status {response.status_code}: {response.text}")
+        
+        token_data = response.json()
+        
+        if not token_data.get('ok'):
+            error = token_data.get('error', 'Unknown error')
+            raise ValueError(f"Token exchange failed: {error}")
+        
+        # Create OAuthTokens object
+        oauth_tokens = OAuthTokens(
+            access_token=token_data.get('access_token'),
+            refresh_token=token_data.get('refresh_token'),
+            token_type=token_data.get('token_type', 'Bearer'),
+            expires_in=token_data.get('expires_in'),
+            scope=token_data.get('scope'),
+            team_id=token_data.get('team', {}).get('id') if token_data.get('team') else None,
+            team_name=token_data.get('team', {}).get('name') if token_data.get('team') else None,
+            user_id=token_data.get('authed_user', {}).get('id') if token_data.get('authed_user') else None,
+            bot_user_id=token_data.get('bot_user_id'),
+            app_id=token_data.get('app_id')
+        )
+        
+        logger.info("✅ OAuth tokens obtained successfully")
+        logger.info(f"   - Access Token: {oauth_tokens.access_token[:20]}...")
+        logger.info(f"   - Team: {oauth_tokens.team_name} ({oauth_tokens.team_id})")
+        logger.info(f"   - User: {oauth_tokens.user_id}")
+        logger.info(f"   - Bot User: {oauth_tokens.bot_user_id}")
+        
+        return oauth_tokens
+
+    async def google_login(self, page: Page, request: LoginRequest) -> Optional[OAuthTokens]:
+        """Google login via Slack (redirects to Google OAuth)."""
+        logger.info("🔄 Google login via Slack OAuth flow")
+        
+        # For Google login, we'll use the OAuth flow with Google as the identity provider
+        # This would require additional configuration for Google OAuth
+        logger.info("🔄 Google login not fully implemented - use OAuth2 flow instead")
+        return None
+
+    # Utility methods for OAuth flow
+    async def get_oauth_url(self, request: LoginRequest) -> str:
+        """Get the OAuth authorization URL for manual use."""
+        return self._build_oauth_url(request)
+
+    async def exchange_code_for_tokens_standalone(self, auth_code: str, request: LoginRequest) -> Optional[OAuthTokens]:
+        """Exchange authorization code for tokens without browser automation."""
+        try:
+            return await self._exchange_code_for_tokens(auth_code, request)
+        except Exception as e:
+            logger.error(f"❌ Standalone token exchange failed: {e}")
+            return None

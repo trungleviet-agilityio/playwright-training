@@ -1,19 +1,32 @@
-"""Browser management for Playwright."""
+"""Local browser provider implementation (refactored from existing BrowserManager)."""
 
+import asyncio
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
-
+from typing import AsyncGenerator, Optional, Dict, Any
 from playwright.async_api import Browser, Page, async_playwright
+from ..base import BrowserProvider
+from ...config import settings
+import logging
 
-from ..config import settings
+logger = logging.getLogger(__name__)
 
 
-class BrowserManager:
-    """Manages browser instances."""
+class LocalBrowserProvider(BrowserProvider):
+    """Local browser provider using Playwright directly."""
+
+    def __init__(self):
+        self.active_sessions: Dict[str, Browser] = {}
 
     @asynccontextmanager
-    async def get_page(self, headless: bool = None, browser_type: str = "chromium") -> AsyncGenerator[Page, None]:
-        """Get a browser page with automatic cleanup."""
+    async def get_page(
+        self,
+        headless: Optional[bool] = None,
+        captcha_solving: bool = True,  # Enable CAPTCHA solving by default
+        proxy_config: Optional[Dict[str, Any]] = None,
+        browser_type: str = "chromium",
+        **kwargs,
+    ) -> AsyncGenerator[Page, None]:
+        """Get a local browser page with automatic cleanup."""
         if headless is None:
             headless = settings.headless
 
@@ -74,8 +87,11 @@ class BrowserManager:
         )
 
         async with async_playwright() as p:
-            # Prefer hosted browser if provided
+            # Check if we should use a remote endpoint
             if settings.browser_ws_endpoint:
+                logger.info(
+                    f"Connecting to remote browser: {settings.browser_ws_endpoint}"
+                )
                 browser = await p.chromium.connect_over_cdp(
                     settings.browser_ws_endpoint
                 )
@@ -91,7 +107,7 @@ class BrowserManager:
                         "Accept-Encoding": "gzip, deflate, br",
                         "Cache-Control": "no-cache",
                         "Pragma": "no-cache",
-                        "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                        "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
                         "Sec-Ch-Ua-Mobile": "?0",
                         "Sec-Ch-Ua-Platform": '"Linux"',
                         "Sec-Fetch-Dest": "document",
@@ -102,6 +118,7 @@ class BrowserManager:
                     },
                 )
             else:
+                # Launch local browser
                 if browser_type == "firefox":
                     # Use Firefox for better compatibility with some sites
                     browser = await p.firefox.launch(headless=headless)
@@ -113,29 +130,31 @@ class BrowserManager:
                         ignore_https_errors=True,
                     )
                 else:
-                    browser = await p.chromium.launch(headless=headless, args=browser_args)
-                context = await browser.new_context(
-                    viewport={"width": 1280, "height": 720},
-                    user_agent=user_agent,
-                    java_script_enabled=True,
-                    accept_downloads=False,
-                    ignore_https_errors=True,
-                    extra_http_headers={
-                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-                        "Accept-Language": "en-US,en;q=0.9",
-                        "Accept-Encoding": "gzip, deflate, br",
-                        "Cache-Control": "no-cache",
-                        "Pragma": "no-cache",
-                        "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-                        "Sec-Ch-Ua-Mobile": "?0",
-                        "Sec-Ch-Ua-Platform": '"Linux"',
-                        "Sec-Fetch-Dest": "document",
-                        "Sec-Fetch-Mode": "navigate",
-                        "Sec-Fetch-Site": "none",
-                        "Sec-Fetch-User": "?1",
-                        "Upgrade-Insecure-Requests": "1",
-                    },
-                )
+                    browser = await p.chromium.launch(
+                        headless=headless, args=browser_args
+                    )
+                    context = await browser.new_context(
+                        viewport={"width": 1280, "height": 720},
+                        user_agent=user_agent,
+                        java_script_enabled=True,
+                        accept_downloads=False,
+                        ignore_https_errors=True,
+                        extra_http_headers={
+                            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                            "Accept-Language": "en-US,en;q=0.9",
+                            "Accept-Encoding": "gzip, deflate, br",
+                            "Cache-Control": "no-cache",
+                            "Pragma": "no-cache",
+                            "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
+                            "Sec-Ch-Ua-Mobile": "?0",
+                            "Sec-Ch-Ua-Platform": '"Linux"',
+                            "Sec-Fetch-Dest": "document",
+                            "Sec-Fetch-Mode": "navigate",
+                            "Sec-Fetch-Site": "none",
+                            "Sec-Fetch-User": "?1",
+                            "Upgrade-Insecure-Requests": "1",
+                        },
+                    )
 
             # Simplified stealth script - no duplicate definitions
             await context.add_init_script(
@@ -195,6 +214,10 @@ class BrowserManager:
 
             page = await context.new_page()
 
+            # Set up CAPTCHA solving if enabled
+            if captcha_solving:
+                await self._setup_captcha_solving(page)
+
             try:
                 yield page
             finally:
@@ -202,3 +225,62 @@ class BrowserManager:
                 # Only close when locally launched
                 if not settings.browser_ws_endpoint:
                     await browser.close()
+
+    async def create_session(self, **kwargs) -> str:
+        """Create a new local browser session."""
+        # For local browsers, sessions are typically short-lived
+        # This could be extended for persistent session management
+        pass
+
+    async def close_session(self, session_id: str) -> bool:
+        """Close a local browser session."""
+        if session_id in self.active_sessions:
+            try:
+                browser = self.active_sessions[session_id]
+                await browser.close()
+                del self.active_sessions[session_id]
+                return True
+            except Exception as e:
+                logger.error(f"Error closing session {session_id}: {e}")
+                return False
+        return False
+
+    async def _setup_captcha_solving(self, page: Page) -> None:
+        """Set up CAPTCHA solving for local browser."""
+        try:
+            logger.info("🔧 Setting up CAPTCHA solving for local browser")
+            
+            # Set up basic CAPTCHA detection
+            await page.evaluate("""
+                window.localCaptchaEvents = {
+                    detected: false,
+                    solving: false,
+                    solved: false,
+                    failed: false
+                };
+                
+                // Basic CAPTCHA detection
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'childList') {
+                            // Check for CAPTCHA elements
+                            const captchaElements = document.querySelectorAll(
+                                'iframe[src*="recaptcha"], .g-recaptcha, .h-captcha, [data-sitekey]'
+                            );
+                            if (captchaElements.length > 0) {
+                                window.localCaptchaEvents.detected = true;
+                                console.log('🔍 CAPTCHA detected by local browser');
+                            }
+                        }
+                    });
+                });
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            """)
+            
+            logger.info("✅ CAPTCHA solving setup complete for local browser")
+        except Exception as e:
+            logger.error(f"❌ Failed to setup CAPTCHA solving: {e}")
